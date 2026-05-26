@@ -54,7 +54,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>3.2.0</version> <!-- Укажите актуальную версию Spring Boot -->
                 <configuration>
-                    <mainClass>ru.yandex.practicum.telemetry.collector.service.TelemetryCollectorApplication</mainClass>
+                    <mainClass>ru.yandex.practicum.telemetry.collector.TelemetryCollectorApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
