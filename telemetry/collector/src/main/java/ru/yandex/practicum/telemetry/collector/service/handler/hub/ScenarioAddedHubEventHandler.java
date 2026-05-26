@@ -2,9 +2,11 @@ package ru.yandex.practicum.telemetry.collector.service.handler.hub;
 
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.collector.model.*;
 import ru.yandex.practicum.telemetry.collector.utils.EnumMapper;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Component
@@ -22,12 +24,10 @@ public class ScenarioAddedHubEventHandler extends BaseHubEventHandler<ScenarioAd
     @Override
     protected GenericRecord mapToAvro(ScenarioAddedEvent event) {
         // Преобразуем Java‑объект в Avro‑запись согласно схеме HubEventProtocol
-        return ScenarioAddedEventAvro.newBuilder()  // Используем Avro‑класс
+        ScenarioAddedEventAvro avroPayload = ScenarioAddedEventAvro.newBuilder()  // Используем Avro‑класс
                 .setName(event.getName())
-                .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp().toEpochMilli())
                 // Заполняем условия сценария с использованием EnumMapper
-                .setConditions(event.getConditions().stream()
+                .setConditions(List.of(event.getConditions().stream()
                         .map((Function<? super ScenarioCondition, ?>) condition -> ScenarioConditionAvro.newBuilder()
                                 .setSensorId(condition.getSensorId())
                                 // Безопасное преобразование enum через утилиту
@@ -37,18 +37,25 @@ public class ScenarioAddedHubEventHandler extends BaseHubEventHandler<ScenarioAd
                                 .setValue(condition.getThresholdValue())
                                 .build()
                         )
-                        .toArray(ScenarioConditionAvro[]::new)
+                        .toArray(ScenarioConditionAvro[]::new))
                 )
                 // Заполняем действия сценария
-                .setActions(event.getActions().stream()
+                .setActions(List.of(event.getActions().stream()
                         .map((Function<? super DeviceAction, ?>) action -> DeviceActionAvro.newBuilder()
                                 .setSensorId(action.getSensorId())
                                 .setType(EnumMapper.map(action.getType(), ActionTypeAvro.class))  // Безопасное преобразование
                                 .setValue(action.getValue())
                                 .build()
                         )
-                        .toArray(DeviceActionAvro[]::new)
+                        .toArray(DeviceActionAvro[]::new))
                 )
+                .build();
+
+        return HubEventAvro.newBuilder()
+                .setHubId(event.getHubId())
+                .setTimestamp(event.getTimestamp())
+                .setPayload(avroPayload)
                 .build();
     }
 }
+

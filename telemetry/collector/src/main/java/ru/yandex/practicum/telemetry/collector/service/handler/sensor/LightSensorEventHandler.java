@@ -2,6 +2,8 @@ package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
 
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.model.LightSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.SensorEventType;
 import ru.yandex.practicum.telemetry.collector.model.KafkaEventProducer;
@@ -30,8 +32,7 @@ public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorE
         return SensorEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp().toEpochMilli())
-                .setType(event.getType().name())
+                .setTimestamp(event.getTimestamp())
                 .setPayload(avroPayload)
                 .build();
     }

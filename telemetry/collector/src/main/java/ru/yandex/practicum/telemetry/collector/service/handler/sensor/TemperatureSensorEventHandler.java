@@ -2,6 +2,8 @@ package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
 
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
 import ru.yandex.practicum.telemetry.collector.model.SensorEventType;
 import ru.yandex.practicum.telemetry.collector.model.TemperatureSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.KafkaEventProducer;
@@ -20,7 +22,7 @@ public class TemperatureSensorEventHandler extends BaseSensorEventHandler<Temper
 
     @Override
     protected GenericRecord mapToAvro(TemperatureSensorEvent event) {
-        TemeperatureSensorAvro avroPayload = TemperatureSensorAvro.newBuilder()
+        TemperatureSensorAvro avroPayload = TemperatureSensorAvro.newBuilder()
                 .setTemperatureC(event.getTemperatureC())
                 .setTemperatureF(event.getTemperatureF())
                 .build();
@@ -28,8 +30,7 @@ public class TemperatureSensorEventHandler extends BaseSensorEventHandler<Temper
         return SensorEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp().toEpochMilli())
-                .setType(event.getType().name())
+                .setTimestamp(event.getTimestamp())
                 .setPayload(avroPayload)
                 .build();
     }
