@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootApplication
-public class Collector {
+public class TelemetryCollectorApplication {
     public static void main(String[] args) {
         // Запускаем Spring Boot приложение
-        ConfigurableApplicationContext context = SpringApplication.run(Collector.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(TelemetryCollectorApplication.class, args);
 
         // Настройка Kafka Producer после того, как Spring Boot уже запущен
         Map<String, Object> producerConfigs = new HashMap<>();
