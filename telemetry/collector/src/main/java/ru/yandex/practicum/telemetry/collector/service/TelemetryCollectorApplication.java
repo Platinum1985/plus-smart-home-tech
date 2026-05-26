@@ -17,9 +17,10 @@ import java.util.Map;
 @SpringBootApplication
 public class TelemetryCollectorApplication {
     public static void main(String[] args) {
-        SpringApplication.run(TelemetryCollectorApplication.class, args);
+        // Запускаем Spring Boot приложение
+        ConfigurableApplicationContext context = SpringApplication.run(TelemetryCollectorApplication.class, args);
 
-        // Настройка Kafka Producer прямо в main (альтернатива @Configuration)
+        // Настройка Kafka Producer после того, как Spring Boot уже запущен
         Map<String, Object> producerConfigs = new HashMap<>();
         producerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -28,12 +29,11 @@ public class TelemetryCollectorApplication {
 
         ProducerFactory<String, GenericRecord> producerFactory =
                 new DefaultKafkaProducerFactory<>(producerConfigs);
+
         KafkaTemplate<String, GenericRecord> kafkaTemplate =
                 new KafkaTemplate<>(producerFactory);
 
-        // Создаём бин KafkaEventProducer вручную и регистрируем его в контексте
-        ConfigurableApplicationContext context =
-                SpringApplication.run(TelemetryCollectorApplication.class, args);
+        // Регистрируем бин KafkaEventProducer в Spring‑контексте
         context.getBeanFactory().registerSingleton(
                 "kafkaEventProducer",
                 new KafkaEventProducer(kafkaTemplate)
