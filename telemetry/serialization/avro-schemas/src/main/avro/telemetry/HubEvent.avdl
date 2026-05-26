@@ -10,12 +10,12 @@ enum DeviceTypeAvro {
 }
 
 record DeviceAddedEventAvro {
-string id;
-DeviceTypeAvro type;
+    string id;
+    DeviceTypeAvro type;
 }
 
 record DeviceRemovedEventAvro {
-string id;
+    string id;
 }
 
 enum ConditionTypeAvro {
@@ -41,37 +41,36 @@ enum ActionTypeAvro {
 }
 
 record ScenarioConditionAvro {
-string sensor_id;
-ConditionTypeAvro type;
-ConditionOperationAvro operation;
-union {null, int, boolean } threshold_value = null; // ← конфликт!  исправил value на threshold_value
+    string sensor_id;
+    ConditionTypeAvro type;
+    ConditionOperationAvro operation;
+    union { null, int, boolean } value = null;
 }
 
 record DeviceActionAvro {
-string sensor_id;
-ActionTypeAvro type;
-int? value = null;
+    string sensor_id;
+    ActionTypeAvro type;
+    int? value = null;
 }
 
 record ScenarioAddedEventAvro {
-string name;
-array<ScenarioConditionAvro> conditions;
-array<DeviceActionAvro> actions;
+    string name;
+    array<ScenarioConditionAvro> conditions;
+    array<DeviceActionAvro> actions;
 }
 
 record ScenarioRemovedEventAvro {
-string name;
+    string name;
 }
 
 record HubEventAvro {
-string hub_id;
-timestamp_ms timestamp;
-string type;           // ← добавляем: например, "DEVICE_ADDED"
-union {
-DeviceAddedEventAvro,
-DeviceRemovedEventAvro,
-ScenarioAddedEventAvro,
-ScenarioRemovedEventAvro
-} payload;
+    string hub_id;
+    timestamp_ms timestamp;
+    union {
+       DeviceAddedEventAvro,
+       DeviceRemovedEventAvro,
+       ScenarioAddedEventAvro,
+       ScenarioRemovedEventAvro
+    } payload;
 }
 }
