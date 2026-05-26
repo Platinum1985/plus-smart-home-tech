@@ -23,7 +23,7 @@ public class TelemetryCollectorApplication {
         Map<String, Object> producerConfigs = new HashMap<>();
         producerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerConfigs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
+        producerConfigs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaEventProducer.class);
         producerConfigs.put("schema.registry.url", "http://localhost:8080");
 
         ProducerFactory<String, GenericRecord> producerFactory =
