@@ -1,10 +1,12 @@
 package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
 
 import org.apache.avro.generic.GenericRecord;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.telemetry.collector.model.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.SensorEventType;
 import ru.yandex.practicum.telemetry.collector.model.KafkaEventProducer;
 
+@Component
 public abstract class BaseSensorEventHandler<E extends SensorEvent> {
     private final KafkaEventProducer producer;
     protected final String topic = "telemetry.sensors.v1";

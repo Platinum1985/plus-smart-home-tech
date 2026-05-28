@@ -1,7 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.telemetry.collector.model.HubEvent;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/events", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/events"/*, consumes = MediaType.APPLICATION_JSON_VALUE*/)
 public class EventController {
 
     // Карты для быстрого поиска обработчиков по типу события
@@ -108,5 +107,28 @@ public class EventController {
                     .status(500)
                     .body("Internal server error");
         }
+    }
+    @GetMapping("/hub-handlers")
+    public ResponseEntity<Map<HubEventType, String>> getHubHandlers() {
+        // Создаём мап, где вместо обработчиков — их классы (для сериализации)
+        Map<HubEventType, String> handlerNames = hubHandlers.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().getClass().getSimpleName()
+                ));
+
+        return ResponseEntity.ok(handlerNames);
+    }
+
+    @GetMapping("/sensor-handlers")
+    public ResponseEntity<Map<SensorEventType, String>> getSensorHandlers() {
+        // Аналогично — заменяем обработчики на названия их классов
+        Map<SensorEventType, String> handlerNames = sensorHandlers.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().getClass().getSimpleName()
+                ));
+
+        return ResponseEntity.ok(handlerNames);
     }
 }
