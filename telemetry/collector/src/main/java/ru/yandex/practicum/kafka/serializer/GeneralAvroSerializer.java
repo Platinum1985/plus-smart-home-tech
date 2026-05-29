@@ -4,10 +4,9 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
+import org.apache.kafka.common.serialization.Serializer;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
-import org.apache.kafka.common.serialization.Serializer;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public class GeneralAvroSerializer implements Serializer<GenericRecord> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        // Здесь можно настроить параметры сериализации, если нужно
+        // Настройки не требуются
     }
 
     @Override
@@ -25,24 +24,38 @@ public class GeneralAvroSerializer implements Serializer<GenericRecord> {
         }
 
         try {
-            // 1. Получаем схему из GenericRecord
+            // Шаг 1. Получаем схему из записи
             Schema schema = data.getSchema();
 
-            // 2. Создаём кодировщик для GenericRecord с учётом схемы
-            DatumWriter<GenericRecord> writer = new GenericDatumWriter<>(schema);
+            // Шаг 2. Сериализуем схему в байты
+            ByteArrayOutputStream schemaStream = new ByteArrayOutputStream();
+            Encoder schemaEncoder = EncoderFactory.get().binaryEncoder(schemaStream, null);
 
-            // 3. Буфер для хранения результата сериализации
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            // Исправленная строка: создаём простую схему для сериализации Schema объекта
+            Schema stringSchema = Schema.create(Schema.Type.STRING);
+            DatumWriter<Schema> schemaWriter = new GenericDatumWriter<>(stringSchema);
+            schemaWriter.write(schema, schemaEncoder);  // Сериализуем схему
+            schemaEncoder.flush();  // Гарантируем запись всех данных
+            byte[] schemaBytes = schemaStream.toByteArray();
 
-            // 4. Создаём бинарный кодировщик Avro
-            Encoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
+            // Шаг 3. Сериализуем данные (без схемы)
+            ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
+            Encoder dataEncoder = EncoderFactory.get().binaryEncoder(dataStream, null);
 
-            // 5. Сериализуем данные
-            writer.write(data, encoder);
-            encoder.flush(); // Гарантируем, что все данные записаны
+            org.apache.avro.specific.SpecificDatumWriter<GenericRecord> writer =
+                    new org.apache.avro.specific.SpecificDatumWriter<>(schema);
+            writer.write(data, dataEncoder);
+            dataEncoder.flush();
+            byte[] dataBytes = dataStream.toByteArray();
 
-            // 6. Возвращаем байтовый массив
-            return outputStream.toByteArray();
+            // Шаг 4. Объединяем: схема + данные
+            int totalLength = schemaBytes.length + dataBytes.length;
+            byte[] result = new byte[totalLength];
+
+            System.arraycopy(schemaBytes, 0, result, 0, schemaBytes.length);
+            System.arraycopy(dataBytes, 0, result, schemaBytes.length, dataBytes.length);
+
+            return result;
         } catch (Exception e) {
             throw new RuntimeException("Ошибка сериализации Avro-сообщения для топика " + topic, e);
         }
