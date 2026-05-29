@@ -24,7 +24,7 @@ public class KafkaConfig {
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer.class
         );
-        configProps.put("schema.registry.url", "http://localhost:8080");
+        //configProps.put("schema.registry.url", "http://localhost:8080");
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
