@@ -1,6 +1,5 @@
 package ru.yandex.practicum.telemetry.collector.configuration;
 
-
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +16,15 @@ public class KafkaConfig {
     public ProducerFactory<String, GenericRecord> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                org.apache.kafka.common.serialization.StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer);
-        //configProps.put("schema.registry.url", "http://localhost:8080");
+        configProps.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                org.apache.kafka.common.serialization.StringSerializer.class
+        );
+        configProps.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer.class
+        );
+        configProps.put("schema.registry.url", "http://localhost:8080");
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
