@@ -1,17 +1,16 @@
 package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
 
-import org.apache.avro.generic.GenericRecord;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.telemetry.collector.KafkaClient;
 import ru.yandex.practicum.telemetry.collector.model.LightSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.SensorEventType;
-import ru.yandex.practicum.telemetry.collector.model.KafkaEventProducer;
 
 @Component
 public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorEvent> {
 
-    public LightSensorEventHandler(KafkaEventProducer producer) {
+    public LightSensorEventHandler(KafkaClient producer) {
         super(producer);
     }
 
@@ -21,7 +20,7 @@ public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorE
     }
 
     @Override
-    protected GenericRecord mapToAvro(LightSensorEvent event) {
+    protected SensorEventAvro mapToAvro(LightSensorEvent event) {
         // Создаём запись Avro для полезной нагрузки
         LightSensorAvro avroPayload = LightSensorAvro.newBuilder()
                 .setLinkQuality(event.getLinkQuality())

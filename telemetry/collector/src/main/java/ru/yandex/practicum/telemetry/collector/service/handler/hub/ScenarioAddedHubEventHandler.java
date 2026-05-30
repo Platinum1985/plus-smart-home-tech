@@ -3,6 +3,7 @@ package ru.yandex.practicum.telemetry.collector.service.handler.hub;
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.*;
+import ru.yandex.practicum.telemetry.collector.KafkaClient;
 import ru.yandex.practicum.telemetry.collector.model.*;
 import ru.yandex.practicum.telemetry.collector.utils.EnumMapper;
 
@@ -12,7 +13,7 @@ import java.util.function.Function;
 @Component
 public class ScenarioAddedHubEventHandler extends BaseHubEventHandler<ScenarioAddedEvent> {
 
-    public ScenarioAddedHubEventHandler(KafkaEventProducer producer) {
+    public ScenarioAddedHubEventHandler(KafkaClient producer) {
         super(producer);
     }
 
@@ -22,7 +23,7 @@ public class ScenarioAddedHubEventHandler extends BaseHubEventHandler<ScenarioAd
     }
 
     @Override
-    protected GenericRecord mapToAvro(ScenarioAddedEvent event) {
+    protected HubEventAvro mapToAvro(ScenarioAddedEvent event) {
         // Преобразуем Java‑объект в Avro‑запись согласно схеме HubEventProtocol
         ScenarioAddedEventAvro avroPayload = ScenarioAddedEventAvro.newBuilder()  // Используем Avro‑класс
                 .setName(event.getName())

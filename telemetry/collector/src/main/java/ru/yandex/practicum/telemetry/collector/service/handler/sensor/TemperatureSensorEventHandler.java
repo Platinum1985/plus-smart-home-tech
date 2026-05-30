@@ -1,17 +1,16 @@
 package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
 
-import org.apache.avro.generic.GenericRecord;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
+import ru.yandex.practicum.telemetry.collector.KafkaClient;
 import ru.yandex.practicum.telemetry.collector.model.SensorEventType;
 import ru.yandex.practicum.telemetry.collector.model.TemperatureSensorEvent;
-import ru.yandex.practicum.telemetry.collector.model.KafkaEventProducer;
 
 @Component
 public class TemperatureSensorEventHandler extends BaseSensorEventHandler<TemperatureSensorEvent> {
 
-    public TemperatureSensorEventHandler(KafkaEventProducer producer) {
+    public TemperatureSensorEventHandler(KafkaClient producer) {
         super(producer);
     }
 
@@ -21,7 +20,7 @@ public class TemperatureSensorEventHandler extends BaseSensorEventHandler<Temper
     }
 
     @Override
-    protected GenericRecord mapToAvro(TemperatureSensorEvent event) {
+    protected SensorEventAvro mapToAvro(TemperatureSensorEvent event) {
         TemperatureSensorAvro avroPayload = TemperatureSensorAvro.newBuilder()
                 .setTemperatureC(event.getTemperatureC())
                 .setTemperatureF(event.getTemperatureF())

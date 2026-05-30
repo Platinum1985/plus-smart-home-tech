@@ -1,16 +1,15 @@
 package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
 
-import org.apache.avro.generic.GenericRecord;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.ClimateSensorAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.telemetry.collector.KafkaClient;
 import ru.yandex.practicum.telemetry.collector.model.ClimateSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.SensorEventType;
-import ru.yandex.practicum.telemetry.collector.model.KafkaEventProducer;
 
 @Component
 public class ClimateSensorEventHandler extends BaseSensorEventHandler<ClimateSensorEvent> {
-    public ClimateSensorEventHandler(KafkaEventProducer producer) {
+    public ClimateSensorEventHandler(KafkaClient producer) {
         super(producer);
     }
 
@@ -20,7 +19,7 @@ public class ClimateSensorEventHandler extends BaseSensorEventHandler<ClimateSen
     }
 
     @Override
-    protected GenericRecord mapToAvro(ClimateSensorEvent event) {
+    protected SensorEventAvro mapToAvro(ClimateSensorEvent event) {
         // Создаём запись Avro для полезной нагрузки
         ClimateSensorAvro avroPayload = ClimateSensorAvro.newBuilder()
                 .setTemperatureC(event.getTemperatureC())
