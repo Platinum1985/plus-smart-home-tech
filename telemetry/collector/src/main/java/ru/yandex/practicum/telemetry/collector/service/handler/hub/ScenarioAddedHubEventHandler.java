@@ -25,27 +25,26 @@ public class ScenarioAddedHubEventHandler extends BaseHubEventHandler<ScenarioAd
 
     @Override
     protected HubEventAvro mapToAvro(ScenarioAddedEvent event) {
-        // Преобразуем условия сценария
-        List<ScenarioConditionAvro> avroConditions = event.getConditions().stream()
+        List<ScenarioConditionAvro> avroConditions = event.getConditions() != null
+                ? event.getConditions().stream()
                 .map(condition -> ScenarioConditionAvro.newBuilder()
                         .setSensorId(condition.getSensorId())
-                        // Безопасное преобразование enum через утилиту
                         .setType(EnumMapper.map(condition.getType(), ConditionTypeAvro.class))
                         .setOperation(EnumMapper.map(condition.getOperation(), ConditionOperationAvro.class))
-                        // Обрабатываем значение с учётом union-типа (null, int, boolean)
                         .setValue(condition.getThresholdValue())
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : List.of(); // Пустой список, если conditions == null
 
-        // Преобразуем действия сценария
-        List<DeviceActionAvro> avroActions = event.getActions().stream()
+        List<DeviceActionAvro> avroActions = event.getActions() != null
+                ? event.getActions().stream()
                 .map(action -> DeviceActionAvro.newBuilder()
                         .setSensorId(action.getSensorId())
-                        // Безопасное преобразование enum
                         .setType(EnumMapper.map(action.getType(), ActionTypeAvro.class))
                         .setValue(action.getValue())
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : List.of();
 
         // Создаём Avro-запись для payload
         ScenarioAddedEventAvro avroPayload = ScenarioAddedEventAvro.newBuilder()
