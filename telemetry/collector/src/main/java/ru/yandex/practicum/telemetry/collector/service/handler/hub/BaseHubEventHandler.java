@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.telemetry.collector.KafkaClient;
@@ -37,10 +39,12 @@ public abstract class BaseHubEventHandler<T extends HubEvent> {
         // 2. Теперь приведение безопасно
         T typedEvent = (T) event;
         log.info("event in BaseHubEventHandler method handle typedEvent = {}", typedEvent);
+
         // 3. Преобразуем в Avro
         HubEventAvro avroEvent = mapToAvro(typedEvent);
         log.info("avroEvent = {}", avroEvent);
-        // 4. Сериализуем Avro-объект в байты
+
+        // 4. Сериализуем Avro‑объект в байты
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             SpecificDatumWriter<HubEventAvro> writer = new SpecificDatumWriter<>(HubEventAvro.getClassSchema());
             Encoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
@@ -48,8 +52,9 @@ public abstract class BaseHubEventHandler<T extends HubEvent> {
             encoder.flush();
             byte[] serializedBytes = outputStream.toByteArray();
 
-            // 5. Отправляем байты в Kafka
-            producer.getProducer().send(topic, serializedBytes);
+            // 5. Отправляем байты в Kafka через ProducerRecord
+            Producer<String, byte[]> kafkaProducer = producer.getProducer();
+            kafkaProducer.send(new ProducerRecord<>(topic, serializedBytes));
             log.info("Message sent to topic: {}, size: {} bytes", topic, serializedBytes.length);
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize and send Avro message", e);

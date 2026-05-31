@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.KafkaClient;
@@ -49,8 +51,9 @@ public abstract class BaseSensorEventHandler<E extends SensorEvent> {
             encoder.flush();
             byte[] serializedBytes = outputStream.toByteArray();
 
-            // 5. Отправляем байты в Kafka
-            producer.getProducer().send(topic, serializedBytes);
+            // 5. Отправляем байты в Kafka через ProducerRecord
+            Producer<String, byte[]> kafkaProducer = producer.getProducer();
+            kafkaProducer.send(new ProducerRecord<>(topic, serializedBytes));
             log.info("Message sent to topic: {}, size: {} bytes", topic, serializedBytes.length);
         } catch (IOException e) {
             throw new RuntimeException("Failed to serialize and send Avro message", e);
