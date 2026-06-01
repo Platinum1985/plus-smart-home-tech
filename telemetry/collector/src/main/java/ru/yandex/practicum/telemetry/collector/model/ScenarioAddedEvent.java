@@ -13,6 +13,7 @@ public class ScenarioAddedEvent extends HubEvent {
     private String name;
     private List<ScenarioCondition> conditions;
     private List<DeviceAction> actions;
+    private DeviceType deviceType;
 
     @Override
     public HubEventType getType() {

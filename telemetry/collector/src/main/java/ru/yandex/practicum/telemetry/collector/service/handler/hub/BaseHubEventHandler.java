@@ -35,9 +35,10 @@ public abstract class BaseHubEventHandler<T extends HubEvent> {
         if (!getMessageType().equals(event.getType())) {
             throw new IllegalArgumentException("Unsupported event type: " + event.getType());
         }
-
+        log.info("event === {}", event);
         // 2. Теперь приведение безопасно
         T typedEvent = (T) event;
+        log.info("typedEvent === {}", typedEvent);
         log.info("event in BaseHubEventHandler method handle typedEvent = {}", typedEvent);
 
         // 3. Преобразуем в Avro

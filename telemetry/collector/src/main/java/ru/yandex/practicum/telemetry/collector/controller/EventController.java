@@ -42,10 +42,11 @@ public class EventController {
 
     @PostMapping("/hubs")
     public ResponseEntity<String> collectHubEvent(@RequestBody HubEvent request) {
+        log.info("REQUEST in controller === {}", request);
         try {
             // Ищем обработчик для типа события
             BaseHubEventHandler<?> handler = hubHandlers.get(request.getType());
-
+            log.info("HANDLER in controller ==== {}", handler);
             if (handler == null) {
                 log.warn("No handler found for hub event type: {}", request.getType());
                 return ResponseEntity
@@ -108,6 +109,7 @@ public class EventController {
                     .body("Internal server error");
         }
     }
+
     @GetMapping("/hub-handlers")
     public ResponseEntity<Map<HubEventType, String>> getHubHandlers() {
         // Создаём мап, где вместо обработчиков — их классы (для сериализации)

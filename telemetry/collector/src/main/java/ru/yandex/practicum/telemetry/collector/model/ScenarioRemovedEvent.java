@@ -9,6 +9,7 @@ import lombok.ToString;
 @ToString
 public class ScenarioRemovedEvent extends HubEvent {
     private String name;
+    private DeviceType deviceType;
 
     @Override
     public HubEventType getType() {

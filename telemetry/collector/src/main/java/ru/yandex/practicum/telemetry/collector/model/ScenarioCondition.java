@@ -1,16 +1,12 @@
 package ru.yandex.practicum.telemetry.collector.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
+@Data
+// Условие сценария, которое содержит информацию о датчике, типе условия, операции и значении
 public class ScenarioCondition {
-    private String sensorId;
-    private ConditionType type;
-    private ConditionOperation operation;
-    // Union {null, int, boolean} → используем Object
-    private Object thresholdValue; // может быть null, Integer или Boolean
+    private String sensorId;                // Идентификатор датчика, связанного с условием
+    private ConditionType type;             // Тип условия
+    private ConditionOperation operation;   // Операции
+    private Integer value;                  // Значение, используемое в условии
 }
