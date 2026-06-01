@@ -8,6 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ClimateSensorEvent extends SensorEvent {
+    private SensorEventType type;
     private Integer temperatureC;
     private Integer humidity;
     private Integer co2Level;

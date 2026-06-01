@@ -8,6 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class SwitchSensorEvent extends SensorEvent {
+    private SensorEventType type;
     private Boolean state;
 
     @Override

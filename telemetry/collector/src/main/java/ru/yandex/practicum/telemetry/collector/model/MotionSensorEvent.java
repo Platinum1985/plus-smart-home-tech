@@ -8,6 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MotionSensorEvent extends SensorEvent {
+    private SensorEventType type;
     private Integer linkQuality;
     private Boolean motion;
     private Integer voltage;
