@@ -33,7 +33,11 @@ public class DefaultKafkaClient implements KafkaClient {
         if (producer != null) {
             try {
                 producer.flush();
+                Thread.sleep(500); // Таймаут 500 мс
                 producer.close();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Восстанавливаем статус прерывания
+                System.err.println("Поток был прерван во время ожидания: " + e.getMessage());
             } catch (Exception e) {
                 System.err.println("Ошибка очистки producer: " + e.getMessage());
             }

@@ -53,7 +53,23 @@ public abstract class BaseSensorEventHandler<E extends SensorEvent> {
 
             // 5. Отправляем байты в Kafka через ProducerRecord
             Producer<String, byte[]> kafkaProducer = producer.getProducer();
-            kafkaProducer.send(new ProducerRecord<>(topic, serializedBytes));
+
+// Получаем идентификатор хаба (ключ для партиционирования)
+            String hubId = avroEvent.getHubId(); // предполагаем, что avroEvent — ваш объект события
+
+// Устанавливаем timestamp вручную — момент отправки
+            long currentTimestamp = System.currentTimeMillis();
+
+// Отправляем запись с ключом и timestamp
+            kafkaProducer.send(
+                    new ProducerRecord<>(
+                            topic,                    // String — название топика
+                            null,                     // Integer partition — null означает «автовыбор партиции»
+                            currentTimestamp,                // Long timestamp — временная метка
+                            hubId,                    // K key — ключ (hubId) ---с одинаковыми hubId в одну патрицию
+                            serializedBytes           // V value — сериализованные данные
+                    )
+            );
             log.info("Message sent to topic: {}, size: {} bytes", topic, serializedBytes.length);
         } catch (IOException e) {
             throw new RuntimeException("Failed to serialize and send Avro message", e);
