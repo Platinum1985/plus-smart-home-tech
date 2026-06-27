@@ -15,11 +15,13 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
+            <version>1.63.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
+            <version>1.63.0</version>
         </dependency>
 
         <!-- Until gRPC generator library moves to generated jakarta instead of javax -->
@@ -44,13 +46,13 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
 
                 <configuration>
-                    <protocVersion>${protobuf.version}</protocVersion>
+                    <protocVersion>3.23.4</protocVersion>
 
                     <binaryMavenPlugins>
                         <binaryMavenPlugin>
                             <groupId>io.grpc</groupId>
                             <artifactId>protoc-gen-grpc-java</artifactId>
-                            <version>${grpc.version}</version>
+                            <version>1.63.0</version>
                         </binaryMavenPlugin>
                     </binaryMavenPlugins>
                 </configuration>
