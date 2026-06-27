@@ -1,9 +1,9 @@
 package ru.yandex.practicum;
 
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
@@ -44,7 +44,7 @@ public class ActionSender {
         log.info("Попытка отправить действие: hub={}, scenario={}, action={}", hubId, scenarioName, scenarioAction.getAction().getType());
 
         try {
-            TypeResolutionContext.Empty response = hubRouterClient.handleDeviceAction(request);
+            com.google.protobuf.Empty response = hubRouterClient.handleDeviceAction(request);
             log.info("Действие отправлено: сценарий={}, тип действия={}", scenarioName, actionEntity.getType());
         } catch (Exception e) {
             log.error("Не удалось отправить действие для сценария {}", scenarioName, e);
