@@ -5,6 +5,7 @@ import io.grpc.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.grpc.telemetry.collector.CollectorControllerGrpc;
 import io.grpc.stub.StreamObserver;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
@@ -36,6 +37,7 @@ public class EventControllerGrpc extends CollectorControllerGrpc.CollectorContro
     private final SensorEventConverterFactory converterFactory;
     private final HubEventConverterFactory hubConverterFactory;
 
+    @Autowired
     public EventControllerGrpc(
             List<BaseHubEventHandler<?>> allHubHandlers,
             List<BaseSensorEventHandler<?>> allSensorHandlers, SensorEventConverterFactory converterFactory, HubEventConverterFactory hubConverterFactory
