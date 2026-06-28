@@ -12,6 +12,7 @@
     <artifactId>collector</artifactId>
 
     <dependencies>
+        <!-- Ваши существующие зависимости -->
         <dependency>
             <groupId>ru.yandex.practicum</groupId>
             <artifactId>avro-schemas</artifactId>
@@ -33,7 +34,14 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.25.3</version> <!-- актуальная версия на момент 2024 года -->
+            <version>3.25.3</version>
+        </dependency>
+
+        <!-- Исправленные и добавленные gRPC‑зависимости -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>1.64.1</version> <!-- Та же версия, что и у grpc-stub -->
         </dependency>
 
         <dependency>
@@ -47,10 +55,13 @@
             <artifactId>grpc-protobuf</artifactId>
             <version>1.64.1</version>
         </dependency>
+
         <dependency>
             <groupId>net.devh</groupId>
             <artifactId>grpc-server-spring-boot-starter</artifactId>
+            <version>3.1.0.RELEASE</version> <!-- Явно указываем версию -->
         </dependency>
+
         <dependency>
             <groupId>ru.yandex.practicum</groupId>
             <artifactId>proto-schemas</artifactId>
@@ -58,17 +69,20 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.2.0</version> <!-- Укажите актуальную версию Spring Boot -->
+                <!-- Версия должна совпадать с родительским pom -->
+                <version>3.3.2</version>
                 <configuration>
                     <mainClass>ru.yandex.practicum.telemetry.collector.TelemetryCollectorApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 
 </project>
