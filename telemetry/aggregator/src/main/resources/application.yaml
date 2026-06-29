@@ -23,5 +23,7 @@ spring:
         serviceId: config-server
       fail-fast: true
       retry:
-        useRandomPolicy: true
-        max-interval: 6000
+        initial-interval: 1000    # начальная задержка между попытками — 1 с
+        multiplier: 1.1           # коэффициент увеличения интервала
+        max-attempts: 6          # максимальное число попыток — 6
+        max-interval: 6000        # максимальный интервал между попытками — 6 с

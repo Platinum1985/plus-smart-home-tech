@@ -145,9 +145,13 @@ public class AggregationStarter {
     private byte[] serializeToAvro(SensorsSnapshotAvro snapshot) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
-        DatumWriter<SensorsSnapshotAvro> writer = new SpecificDatumWriter<>(SensorsSnapshotAvro.getClassSchema());
+
+        // Используем правильный метод для получения схемы
+        DatumWriter<SensorsSnapshotAvro> writer = new SpecificDatumWriter<>(SensorsSnapshotAvro.SCHEMA$);
         writer.write(snapshot, encoder);
         encoder.flush();
+        outputStream.close();
+
         return outputStream.toByteArray();
     }
 
