@@ -6,9 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.ConfigurableApplicationContext;
 import ru.yandex.practicum.processor.HubEventProcessor;
 import ru.yandex.practicum.processor.SnapshotProcessor;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-@EnableDiscoveryClient
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class Analyzer {

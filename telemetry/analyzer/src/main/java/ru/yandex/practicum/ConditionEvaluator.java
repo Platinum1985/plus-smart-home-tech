@@ -10,8 +10,6 @@ import ru.yandex.practicum.model.ScenarioCondition;
 
 import java.util.Map;
 
-import static ru.yandex.practicum.kafka.telemetry.event.ConditionOperationAvro.*;
-import static ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro.*;
 
 @Log4j2
 @Component
