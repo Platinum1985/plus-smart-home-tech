@@ -4,6 +4,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/smart-home-tech
     username: smart-home-tech
     password: smart-home-tech
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: analyzer-group
 
 grpc:
   client:
@@ -12,10 +16,6 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: analyzer-group
 
-server:  # ← добавляем секцию server
+server:
   port: 8082
