@@ -3,7 +3,11 @@
 spring:
   application:
     name: aggregator
+  kafka:                    # ← kafka должна быть на одном уровне с application
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: aggregator-group
 
- # config:
+  # config:
   #  import: 'configserver:http://localhost:8888'
 
