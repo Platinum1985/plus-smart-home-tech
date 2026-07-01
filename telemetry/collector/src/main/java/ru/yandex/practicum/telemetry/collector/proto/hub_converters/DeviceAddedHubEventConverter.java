@@ -17,6 +17,7 @@ public class DeviceAddedHubEventConverter implements HubEventConverter {
         DeviceAddedEventProto deviceProto = proto.getDeviceAdded();
 
         event.setId(deviceProto.getId());
+        event.setHubId(proto.getHubId());
         event.setDeviceType(convertDeviceType(deviceProto.getType()));
 
         return event;

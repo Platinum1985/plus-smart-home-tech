@@ -15,6 +15,7 @@ public class DeviceRemovedHubEventConverter implements HubEventConverter {
         DeviceRemovedEventProto deviceProto = proto.getDeviceRemoved();
 
         event.setId(deviceProto.getId());
+        event.setHubId(proto.getHubId());
 
         return event;
     }
