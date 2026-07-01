@@ -6,6 +6,8 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.telemetry.collector.model.ClimateSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.SensorEvent;
 
+import java.time.Instant;
+
 @Component
 public class ClimateSensorConverter implements SensorEventConverter {
     @Override
@@ -32,5 +34,11 @@ public class ClimateSensorConverter implements SensorEventConverter {
     protected void copyCommonFields(SensorEventProto proto, SensorEvent event) {
         event.setId(proto.getId());
         event.setHubId(proto.getHubId());
+        com.google.protobuf.Timestamp protoTimestamp = proto.getTimestamp();
+        Instant timestamp = Instant.ofEpochSecond(
+                protoTimestamp.getSeconds(),
+                protoTimestamp.getNanos()
+        );
+        event.setTimestamp(timestamp);
     }
 }

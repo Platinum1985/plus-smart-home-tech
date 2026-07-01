@@ -6,6 +6,8 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.telemetry.collector.model.MotionSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.SensorEvent;
 
+import java.time.Instant;
+
 @Component
 public class MotionSensorConverter implements SensorEventConverter {
     @Override
@@ -33,5 +35,11 @@ public class MotionSensorConverter implements SensorEventConverter {
         event.setId(proto.getId());
         event.setHubId(proto.getHubId());
         // Таймстемп уже инициализирован по умолчанию в SensorEvent
+        com.google.protobuf.Timestamp protoTimestamp = proto.getTimestamp();
+        Instant timestamp = Instant.ofEpochSecond(
+                protoTimestamp.getSeconds(),
+                protoTimestamp.getNanos()
+        );
+        event.setTimestamp(timestamp);
     }
 }

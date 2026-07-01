@@ -6,6 +6,8 @@ import ru.yandex.practicum.grpc.telemetry.event.SwitchSensorProto;
 import ru.yandex.practicum.telemetry.collector.model.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.SwitchSensorEvent;
 
+import java.time.Instant;
+
 @Component
 public class SwitchSensorConverter implements SensorEventConverter {
     @Override
@@ -30,5 +32,11 @@ public class SwitchSensorConverter implements SensorEventConverter {
     protected void copyCommonFields(SensorEventProto proto, SensorEvent event) {
         event.setId(proto.getId());
         event.setHubId(proto.getHubId());
+        com.google.protobuf.Timestamp protoTimestamp = proto.getTimestamp();
+        Instant timestamp = Instant.ofEpochSecond(
+                protoTimestamp.getSeconds(),
+                protoTimestamp.getNanos()
+        );
+        event.setTimestamp(timestamp);
     }
 }

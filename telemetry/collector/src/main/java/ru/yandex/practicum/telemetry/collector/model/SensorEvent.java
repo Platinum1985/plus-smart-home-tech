@@ -30,7 +30,7 @@ public abstract class SensorEvent {
     private String id;
     @NotBlank
     private String hubId;
-    private Instant timestamp = Instant.now();
+    private Instant timestamp;
 
     // Поле type для Jackson — добавляется автоматически при сериализации
     @NotNull
