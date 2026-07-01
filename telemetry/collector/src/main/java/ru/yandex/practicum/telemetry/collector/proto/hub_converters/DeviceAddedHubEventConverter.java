@@ -20,7 +20,7 @@ public class DeviceAddedHubEventConverter implements HubEventConverter {
 
         event.setHubId(proto.getHubId());
 
-        // Преобразуем Timestamp (Protobuf) в Instant (Java)
+        // Преобразуем Timestamp (Protobuf) в Instant java
         com.google.protobuf.Timestamp protoTimestamp = proto.getTimestamp();
         Instant timestamp = Instant.ofEpochSecond(
                 protoTimestamp.getSeconds(),
