@@ -6,6 +6,8 @@ import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.telemetry.collector.model.DeviceRemovedEvent;
 import ru.yandex.practicum.telemetry.collector.model.HubEvent;
 
+import java.time.Instant;
+
 @Component
 public class DeviceRemovedHubEventConverter implements HubEventConverter {
 
@@ -16,6 +18,14 @@ public class DeviceRemovedHubEventConverter implements HubEventConverter {
 
         event.setId(deviceProto.getId());
         event.setHubId(proto.getHubId());
+
+        // Преобразуем Timestamp (Protobuf) в Instant java
+        com.google.protobuf.Timestamp protoTimestamp = proto.getTimestamp();
+        Instant timestamp = Instant.ofEpochSecond(
+                protoTimestamp.getSeconds(),
+                protoTimestamp.getNanos()
+        );
+        event.setTimestamp(timestamp);
 
         return event;
     }

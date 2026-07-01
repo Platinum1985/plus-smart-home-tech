@@ -6,6 +6,7 @@ import ru.yandex.practicum.telemetry.collector.model.*;
 import ru.yandex.practicum.telemetry.collector.model.HubEvent;
 import ru.yandex.practicum.telemetry.collector.utils.EnumMapper;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +18,16 @@ public class ScenarioAddedHubEventConverter implements HubEventConverter {
         ScenarioAddedEvent event = new ScenarioAddedEvent();
         ScenarioAddedEventProto scenarioProto = proto.getScenarioAdded();
 
+        event.setHubId(proto.getHubId());
         event.setName(scenarioProto.getName());
         event.setConditions(convertConditions(scenarioProto.getConditionList()));
         event.setActions(convertActions(scenarioProto.getActionList()));
+        com.google.protobuf.Timestamp protoTimestamp = proto.getTimestamp();
+        Instant timestamp = Instant.ofEpochSecond(
+                protoTimestamp.getSeconds(),
+                protoTimestamp.getNanos()
+        );
+        event.setTimestamp(timestamp);
 
         return event;
     }
