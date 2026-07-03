@@ -63,9 +63,7 @@ public class AggregationStarter {
                     SensorEventAvro event = sensorEventDeserializer.deserialize(record.topic(), record.value());
                     if (event != null) {
                         Optional<SensorsSnapshotAvro> updatedSnapshot = updateState(event);
-                        if (updatedSnapshot.isPresent()) {
-                            sendSnapshot(updatedSnapshot.get());
-                        }
+                        updatedSnapshot.ifPresent(this::sendSnapshot);
                     }
                 }
 
