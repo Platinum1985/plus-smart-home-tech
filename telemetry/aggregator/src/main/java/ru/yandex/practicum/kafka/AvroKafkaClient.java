@@ -42,7 +42,7 @@ public class AvroKafkaClient implements KafkaClient {
     @Value("${spring.kafka.consumer.properties.heartbeat.interval.ms:3000}")
     private int heartbeatIntervalMs;
 
-    @Value("${spring.kafka.consumer.properties.max.poll.interval.ms:300000}")
+    @Value("${spring.kafka.consumer.properties.max.poll.interval.ms:300000}") //300 000->10 000 ТЗМЕНИЛ
     private int maxPollIntervalMs;
 
     @Value("${spring.kafka.consumer.properties.max.poll.records:100}")

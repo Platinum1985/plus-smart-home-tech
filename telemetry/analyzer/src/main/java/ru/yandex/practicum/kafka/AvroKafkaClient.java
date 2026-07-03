@@ -35,16 +35,16 @@ public class AvroKafkaClient implements KafkaClient {
     @Value("${spring.kafka.consumer.enable-auto-commit:false}")
     private boolean enableAutoCommit;
 
-    @Value("${spring.kafka.consumer.properties.session.timeout.ms:10000}")
+    @Value("${spring.kafka.consumer.properties.session.timeout.ms:30000}") //10000->30000
     private int sessionTimeoutMs;
 
     @Value("${spring.kafka.consumer.properties.heartbeat.interval.ms:3000}")
     private int heartbeatIntervalMs;
 
-    @Value("${spring.kafka.consumer.properties.max.poll.interval.ms:300000}")
+    @Value("${spring.kafka.consumer.properties.max.poll.interval.ms:60000}")//300000->60000
     private int maxPollIntervalMs;
 
-    @Value("${spring.kafka.consumer.properties.max.poll.records:100}")
+    @Value("${spring.kafka.consumer.properties.max.poll.records:10}")//100 сообщений->10 сообщений
     private int maxPollRecords;
 
     @Value("${spring.kafka.consumer.properties.request.timeout.ms:20000}")
