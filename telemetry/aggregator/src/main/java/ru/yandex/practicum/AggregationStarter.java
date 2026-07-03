@@ -145,7 +145,7 @@ public class AggregationStarter {
         BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
 
         // Используем правильный метод для получения схемы
-        DatumWriter<SensorsSnapshotAvro> writer = new SpecificDatumWriter<>(SensorsSnapshotAvro.SCHEMA$);
+        DatumWriter<SensorsSnapshotAvro> writer = new SpecificDatumWriter<>(SensorsSnapshotAvro.getClassSchema());
         writer.write(snapshot, encoder);
         encoder.flush();
         outputStream.close();
