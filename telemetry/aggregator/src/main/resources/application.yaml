@@ -1,5 +1,4 @@
 
-
 spring:
   application:
     name: aggregator
@@ -8,9 +7,9 @@ spring:
     consumer:
       group-id: aggregator-group
 
-server:  # ← добавляем секцию server
+server:
   port: 8081
 
-  # config:
-  #  import: 'configserver:http://localhost:8888'
+# config:
+#  import: 'configserver:http://localhost:8888'
 

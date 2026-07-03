@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SnapshotProcessor implements Runnable {
 
-    @Value("${kafka.topics.snapshot:telemetry.snapshots.v1}")
+    @Value("${spring.kafka.topics.snapshot:telemetry.snapshots.v1}")
     private String snapshotTopic;
 
     private final KafkaClient kafkaClient;
