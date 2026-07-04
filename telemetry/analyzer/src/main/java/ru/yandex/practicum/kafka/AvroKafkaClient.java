@@ -23,8 +23,7 @@ import java.util.Map;
 @Component
 public class AvroKafkaClient implements KafkaClient {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+    private static final String BOOTSTRAP_SERVERS = "localhost:9092"; // временно
 
     @Value("${spring.kafka.consumer.group-id:analyzer-group}")
     private String groupId;
