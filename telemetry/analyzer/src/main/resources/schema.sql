@@ -44,30 +44,31 @@ CREATE TABLE IF NOT EXISTS scenario_actions (
     PRIMARY KEY (scenario_id, sensor_id, action_id)
 );
 
--- Создаём функцию без сложных объявлений переменных — это надёжнее для Spring Boot
 CREATE OR REPLACE FUNCTION check_hub_id()
-    RETURNS TRIGGER AS $$
+    RETURNS TRIGGER AS
+'
 BEGIN
     -- Проверяем существование сценария
     IF NOT EXISTS (SELECT 1 FROM scenarios WHERE id = NEW.scenario_id) THEN
-        RAISE EXCEPTION 'Scenario with ID % does not exist', NEW.scenario_id;
+        RAISE EXCEPTION ''Scenario with ID % does not exist'', NEW.scenario_id;
     END IF;
 
     -- Проверяем существование датчика
     IF NOT EXISTS (SELECT 1 FROM sensors WHERE id = NEW.sensor_id) THEN
-        RAISE EXCEPTION 'Sensor with ID % does not exist', NEW.sensor_id;
+        RAISE EXCEPTION ''Sensor with ID % does not exist'', NEW.sensor_id;
     END IF;
 
     -- Сравниваем hub_id напрямую через подзапросы
     IF (SELECT hub_id FROM scenarios WHERE id = NEW.scenario_id) !=
        (SELECT hub_id FROM sensors WHERE id = NEW.sensor_id) THEN
-        RAISE EXCEPTION 'Hub IDs do not match for scenario_id % and sensor_id %',
+        RAISE EXCEPTION ''Hub IDs do not match for scenario_id % and sensor_id %'',
             NEW.scenario_id, NEW.sensor_id;
     END IF;
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+'
+LANGUAGE plpgsql;
 
 -- затем создаём триггеры
 CREATE TRIGGER tr_bi_scenario_conditions_hub_id_check
