@@ -4,10 +4,21 @@ spring:
     url: jdbc:postgresql://localhost:5432/smart-home-tech
     username: smart-home-tech
     password: smart-home-tech
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: analyzer-group
+  sql:
+    init:
+      mode: always  # ← гарантирует применение схемы при старте
+  jpa:
+    hibernate:
+      ddl-auto: none  # ← отключает автоматическую генерацию DDL
+  # Если есть файлы с SQL‑скриптами для создания таблиц — укажите пути
+  # sql-init:
+  #   data-locations: classpath:db/schema.sql
+  #   scripts: classpath:db/data.sql
+
+kafka:
+  bootstrap-servers: localhost:9092
+  consumer:
+    group-id: analyzer-group
 
 grpc:
   client:
