@@ -44,32 +44,25 @@ CREATE TABLE IF NOT EXISTS scenario_actions (
     PRIMARY KEY (scenario_id, sensor_id, action_id)
 );
 
--- Создаём функцию с улучшенной обработкой NULL-значений
+-- Создаём функцию без сложных объявлений переменных — это надёжнее для Spring Boot
 CREATE OR REPLACE FUNCTION check_hub_id()
     RETURNS TRIGGER AS $$
 BEGIN
-    -- Получаем hub_id из сценариев и датчиков
-    DECLARE scenario_hub VARCHAR;
-    DECLARE sensor_hub VARCHAR;
-
-    -- Безопасное получение значений с обработкой возможных NULL
-    SELECT hub_id INTO scenario_hub
-    FROM scenarios
-    WHERE id = NEW.scenario_id;
-
-    SELECT hub_id INTO sensor_hub
-    FROM sensors
-    WHERE id = NEW.sensor_id;
-
-    -- Проверяем, что оба значения найдены и совпадают
-    IF scenario_hub IS NULL OR sensor_hub IS NULL THEN
-        RAISE EXCEPTION 'Either scenario_id or sensor_id does not exist: scenario_id=% sensor_id=%',
-            NEW.scenario_id, NEW.sensor_id;
+    -- Проверяем существование сценария
+    IF NOT EXISTS (SELECT 1 FROM scenarios WHERE id = NEW.scenario_id) THEN
+        RAISE EXCEPTION 'Scenario with ID % does not exist', NEW.scenario_id;
     END IF;
 
-    IF scenario_hub != sensor_hub THEN
-        RAISE EXCEPTION 'Hub IDs do not match for scenario_id % and sensor_id %, scenario_hub % and sensor_hub %',
-            NEW.scenario_id, NEW.sensor_id, scenario_hub, sensor_hub;
+    -- Проверяем существование датчика
+    IF NOT EXISTS (SELECT 1 FROM sensors WHERE id = NEW.sensor_id) THEN
+        RAISE EXCEPTION 'Sensor with ID % does not exist', NEW.sensor_id;
+    END IF;
+
+    -- Сравниваем hub_id напрямую через подзапросы
+    IF (SELECT hub_id FROM scenarios WHERE id = NEW.scenario_id) !=
+       (SELECT hub_id FROM sensors WHERE id = NEW.sensor_id) THEN
+        RAISE EXCEPTION 'Hub IDs do not match for scenario_id % and sensor_id %',
+            NEW.scenario_id, NEW.sensor_id;
     END IF;
 
     RETURN NEW;
