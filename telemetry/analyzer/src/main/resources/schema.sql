@@ -44,15 +44,34 @@ CREATE TABLE IF NOT EXISTS scenario_actions (
     PRIMARY KEY (scenario_id, sensor_id, action_id)
 );
 
--- создаём функцию для проверки, что связываемые сценарий и датчик работают с одним и тем же хабом
+-- Создаём функцию с улучшенной обработкой NULL-значений
 CREATE OR REPLACE FUNCTION check_hub_id()
     RETURNS TRIGGER AS $$
 BEGIN
-    IF (SELECT hub_id FROM scenarios WHERE id = NEW.scenario_id) !=
-       (SELECT hub_id FROM sensors WHERE id = NEW.sensor_id) THEN
-        RAISE EXCEPTION 'Hub IDs do not match for scenario_id % and sensor_id %',
+    -- Получаем hub_id из сценариев и датчиков
+    DECLARE scenario_hub VARCHAR;
+    DECLARE sensor_hub VARCHAR;
+
+    -- Безопасное получение значений с обработкой возможных NULL
+    SELECT hub_id INTO scenario_hub
+    FROM scenarios
+    WHERE id = NEW.scenario_id;
+
+    SELECT hub_id INTO sensor_hub
+    FROM sensors
+    WHERE id = NEW.sensor_id;
+
+    -- Проверяем, что оба значения найдены и совпадают
+    IF scenario_hub IS NULL OR sensor_hub IS NULL THEN
+        RAISE EXCEPTION 'Either scenario_id or sensor_id does not exist: scenario_id=% sensor_id=%',
             NEW.scenario_id, NEW.sensor_id;
     END IF;
+
+    IF scenario_hub != sensor_hub THEN
+        RAISE EXCEPTION 'Hub IDs do not match for scenario_id % and sensor_id %, scenario_hub % and sensor_hub %',
+            NEW.scenario_id, NEW.sensor_id, scenario_hub, sensor_hub;
+    END IF;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
