@@ -18,12 +18,11 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Slf4j
 @Component
 public class AvroKafkaClient implements KafkaClient {
 
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092"; // временно
+    private static final String BOOTSTRAP_SERVERS = "localhost:9092"; // жёстко заданный адрес
 
     @Value("${spring.kafka.consumer.group-id:analyzer-group}")
     private String groupId;
@@ -110,7 +109,7 @@ public class AvroKafkaClient implements KafkaClient {
 
     private Map<String, Object> createProducerProps() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS); // используем константу
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
         props.put(ProducerConfig.ACKS_CONFIG, acks);
@@ -121,7 +120,7 @@ public class AvroKafkaClient implements KafkaClient {
     private Map<String, Object> createConsumerProps() {
         Map<String, Object> props = new HashMap<>();
 
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS); // используем константу
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
