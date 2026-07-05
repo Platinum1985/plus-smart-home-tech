@@ -6,14 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
+
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -72,18 +72,28 @@ public class AvroKafkaClient implements KafkaClient {
     @Value("${spring.kafka.producer.properties.retries:3}")
     private int retries;
 
-    private KafkaTemplate<String, byte[]> producer;
+    private KafkaProducer<String, byte[]> producer;
     private Consumer<String, byte[]> consumer;
 
     @Override
-    public KafkaTemplate<String, byte[]> getProducer() {
+    public KafkaProducer<String, byte[]> getProducer() {
         if (producer == null) {
-            producer = new KafkaTemplate<>(
-                    new DefaultKafkaProducerFactory<>(createProducerProps())
-            );
+            producer = new KafkaProducer<>(createProducerProps());
             log.info("Kafka producer инициализирован");
         }
         return producer;
+    }
+
+    @Override
+    public void flush() {
+        if (producer != null) {
+            try {
+                producer.flush();
+                log.info("Kafka producer успешно очищен");
+            } catch (Exception e) {
+                log.error("Ошибка очистки producer: {}", e.getMessage(), e);
+            }
+        }
     }
 
     public Consumer<String, byte[]> getConsumer() {
@@ -112,6 +122,11 @@ public class AvroKafkaClient implements KafkaClient {
                 log.error("Ошибка закрытия consumer: {}", e.getMessage(), e);
             }
         }
+    }
+
+    @Override
+    public void sendMessage(String topic, String key, byte[] value) throws InterruptedException {
+        getProducer().send(new org.apache.kafka.clients.producer.ProducerRecord<>(topic, key, value));
     }
 
     private Map<String, Object> createProducerProps() {
