@@ -9,6 +9,7 @@ import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.deserialize.SensorEventDeserializer;
 import ru.yandex.practicum.kafka.KafkaClient;
@@ -29,6 +30,7 @@ import java.util.List;
 public class AggregationStarter {
 
     private final KafkaClient kafkaClient;
+    @Value("${spring.kafka.topics.snapshot:telemetry.snapshots.v1}")
     private final String snapshotTopic;
 
     // Десериализатор событий сенсора
