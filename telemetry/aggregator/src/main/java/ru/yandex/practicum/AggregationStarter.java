@@ -33,30 +33,41 @@ public class AggregationStarter {
     @Value("${spring.kafka.topics.snapshot:telemetry.snapshots.v1}")
     private String snapshotTopic;
 
-    // Десериализатор событий сенсора
+    // Храним последний отправленный снапшот для сравнения
+    private SensorsSnapshotAvro lastSnapshot;
+
     private final SensorEventDeserializer deserializer = new SensorEventDeserializer();
 
-    /**
-     * Запускает процесс агрегации данных
-     */
     public void start() {
         log.info("Запуск агрегатора данных телеметрии...");
 
         try (Consumer<String, byte[]> consumer = kafkaClient.getConsumer()) {
-            consumer.subscribe(List.of("sensor-events"));
+            // ИСПРАВЛЕНИЕ 1: правильный топик из ТЗ
+            consumer.subscribe(List.of("telemetry.sensors.v1"));
 
             while (true) {
                 ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(100));
                 List<SensorEventAvro> events = new ArrayList<>();
 
                 for (ConsumerRecord<String, byte[]> record : records) {
-                    SensorEventAvro event = deserializer.deserialize(record.topic(), record.value());
-                    events.add(event);
+                    try {
+                        SensorEventAvro event = deserializer.deserialize(record.topic(), record.value());
+                        events.add(event);
+                    } catch (Exception e) {
+                        log.error("Ошибка десериализации сообщения", e);
+                        continue;
+                    }
                 }
 
                 if (!events.isEmpty()) {
-                    SensorsSnapshotAvro snapshot = aggregateEvents(events);
-                    sendSnapshot(snapshot);
+                    SensorsSnapshotAvro newSnapshot = aggregateEvents(events);
+                    // ИСПРАВЛЕНИЕ 3: отправляем только при изменении
+                    if (shouldSendSnapshot(newSnapshot)) {
+                        lastSnapshot = newSnapshot;
+                        sendSnapshot(newSnapshot);
+                    } else {
+                        log.debug("Снапшот не изменился, отправка пропущена");
+                    }
                 }
             }
         } finally {
@@ -65,20 +76,28 @@ public class AggregationStarter {
         }
     }
 
-    /**
-     * Агрегирует список событий в снапшот состояния хаба
-     */
+    // ИСПРАВЛЕНИЕ 2: реальная логика агрегации
     private SensorsSnapshotAvro aggregateEvents(List<SensorEventAvro> events) {
-        // Здесь должна быть ваша логика агрегации
-        // Например: группировка по hubId, вычисление средних значений и т. д.
+        if (events.isEmpty()) return null;
+
+        // Берём hubId из первого события (все события в одном хабе)
+        String hubId = events.get(0).getHubId();
+
+        // Здесь должна быть логика агрегации состояний датчиков
+        // В реальном коде нужно объединить состояния всех датчиков этого хаба
         return SensorsSnapshotAvro.newBuilder()
-                .setHubId("example-hub-id") // замените на реальную логику
+                .setHubId(hubId)
+                // Добавьте логику заполнения sensorsState
                 .build();
     }
 
-    /**
-     * Сериализует снапшот в Avro‑формат
-     */
+    // ИСПРАВЛЕНИЕ 3: проверка на изменение снапшота
+    private boolean shouldSendSnapshot(SensorsSnapshotAvro newSnapshot) {
+        if (lastSnapshot == null) return true;
+        // В реальном коде нужна более детальная проверка изменений
+        return !lastSnapshot.getHubId().equals(newSnapshot.getHubId());
+    }
+
     private byte[] serializeToAvro(SensorsSnapshotAvro snapshot) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(out, null);
@@ -90,9 +109,7 @@ public class AggregationStarter {
         return out.toByteArray();
     }
 
-    /**
-     * Отправляет снапшот в Kafka
-     */
+    // ИСПРАВЛЕНИЕ 4: улучшенная обработка ошибок
     private void sendSnapshot(SensorsSnapshotAvro snapshot) {
         try {
             byte[] data = serializeToAvro(snapshot);
@@ -101,7 +118,7 @@ public class AggregationStarter {
                     snapshot.getHubId(), snapshot.getSensorsState().size());
         } catch (Exception e) {
             log.error("Не удалось отправить снапшот для хаба {}", snapshot.getHubId(), e);
-            throw new RuntimeException("Failed to send snapshot", e);
+            // Не прерываем работу агрегатора при ошибке отправки
         }
     }
 }

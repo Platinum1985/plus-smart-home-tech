@@ -162,6 +162,7 @@ public class AvroKafkaClient implements KafkaClient {
         props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, fetchMaxWaitMs);
         props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPartitionFetchBytes);
 
+        log.info("Созданы настройки consumer с group.id: {}", groupId);
         return props;
     }
 }
