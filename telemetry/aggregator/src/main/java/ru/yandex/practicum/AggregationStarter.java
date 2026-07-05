@@ -31,7 +31,7 @@ public class AggregationStarter {
 
     private final KafkaClient kafkaClient;
     @Value("${spring.kafka.topics.snapshot:telemetry.snapshots.v1}")
-    private final String snapshotTopic;
+    private String snapshotTopic;
 
     // Десериализатор событий сенсора
     private final SensorEventDeserializer deserializer = new SensorEventDeserializer();
