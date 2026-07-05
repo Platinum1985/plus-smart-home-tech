@@ -1,5 +1,6 @@
 package ru.yandex.practicum.kafka;
 
+import java.util.concurrent.ExecutionException;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.consumer.Consumer;
 
