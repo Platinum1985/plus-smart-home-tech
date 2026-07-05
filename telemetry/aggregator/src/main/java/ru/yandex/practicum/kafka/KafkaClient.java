@@ -1,17 +1,11 @@
-
 package ru.yandex.practicum.kafka;
 
-import java.util.concurrent.ExecutionException;
-
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.springframework.kafka.core.KafkaTemplate;
 
 public interface KafkaClient {
-    KafkaProducer<String, byte[]> getProducer();
 
+    KafkaTemplate<String, byte[]> getProducer();
     Consumer<String, byte[]> getConsumer();
 
-    void sendMessage(String topic, String key, byte[] value) throws InterruptedException, ExecutionException;
-
-    void flush();
 }

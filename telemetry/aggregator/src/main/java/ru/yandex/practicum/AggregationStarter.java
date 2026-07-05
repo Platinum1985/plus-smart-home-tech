@@ -9,116 +9,155 @@ import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.deserialize.SensorEventDeserializer;
 import ru.yandex.practicum.kafka.KafkaClient;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-
-
+/**
+ * Класс AggregationStarter, ответственный за запуск агрегации данных.
+ */
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class AggregationStarter {
 
-    private final KafkaClient kafkaClient;
+    @Value("${spring.kafka.topics.sensor:telemetry.sensors.v1}")
+    private String sensorTopic;
+
     @Value("${spring.kafka.topics.snapshot:telemetry.snapshots.v1}")
     private String snapshotTopic;
 
-    // Храним последний отправленный снапшот для сравнения
-    private SensorsSnapshotAvro lastSnapshot;
+    private final KafkaClient kafkaClient;
+    private final SensorEventDeserializer sensorEventDeserializer;
 
-    private final SensorEventDeserializer deserializer = new SensorEventDeserializer();
+    private Consumer<String, byte[]> consumer;
+    private volatile boolean running = true;
+
+    private final Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
 
     public void start() {
-        log.info("Запуск агрегатора данных телеметрии...");
+        try {
+            consumer = kafkaClient.getConsumer();
+            consumer.subscribe(Collections.singleton(sensorTopic));
 
-        try (Consumer<String, byte[]> consumer = kafkaClient.getConsumer()) {
-            // ИСПРАВЛЕНИЕ 1: правильный топик из ТЗ
-            consumer.subscribe(List.of("telemetry.sensors.v1"));
+            // Отключаем авто-коммит
+            consumer.commitSync(); // инициализация
 
-            while (true) {
-                ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(100));
-                List<SensorEventAvro> events = new ArrayList<>();
+            log.info("Агрегация запущена, слушаем топик: {}", sensorTopic);
+
+            while (running) {
+                ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(1000));
 
                 for (ConsumerRecord<String, byte[]> record : records) {
-                    try {
-                        SensorEventAvro event = deserializer.deserialize(record.topic(), record.value());
-                        events.add(event);
-                    } catch (Exception e) {
-                        log.error("Ошибка десериализации сообщения", e);
-                        continue;
+                    SensorEventAvro event = sensorEventDeserializer.deserialize(record.topic(), record.value());
+                    if (event != null) {
+                        Optional<SensorsSnapshotAvro> updatedSnapshot = updateState(event);
+                        updatedSnapshot.ifPresent(this::sendSnapshot);
                     }
                 }
 
-                if (!events.isEmpty()) {
-                    SensorsSnapshotAvro newSnapshot = aggregateEvents(events);
-                    // ИСПРАВЛЕНИЕ 3: отправляем только при изменении
-                    if (shouldSendSnapshot(newSnapshot)) {
-                        lastSnapshot = newSnapshot;
-                        sendSnapshot(newSnapshot);
-                    } else {
-                        log.debug("Снапшот не изменился, отправка пропущена");
-                    }
-                }
+                // Принудительно отправляем все буферизованные сообщения
+                kafkaClient.getProducer().flush();
+
+                // Коммитим offset только после успешной отправки всех снапшотов
+                consumer.commitSync();
             }
-        } finally {
-            kafkaClient.flush();
-            log.info("Агрегация завершена");
+        } catch (WakeupException e) {
+            log.info("Получен сигнал завершения, останавливаемся");
+        } catch (Exception e) {
+            log.error("Ошибка во время обработки событий от датчиков", e);
         }
     }
 
-    // ИСПРАВЛЕНИЕ 2: реальная логика агрегации
-    private SensorsSnapshotAvro aggregateEvents(List<SensorEventAvro> events) {
-        if (events.isEmpty()) return null;
+    private Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
+        String hubId = event.getHubId();
+        String sensorId = event.getId();
+        long eventTimestamp = event.getTimestamp().toEpochMilli(); // !!! миллисек
 
-        // Берём hubId из первого события (все события в одном хабе)
-        String hubId = events.get(0).getHubId();
+        SensorsSnapshotAvro snapshot = snapshots.get(hubId);
+        if (snapshot == null) {
+            snapshot = SensorsSnapshotAvro.newBuilder()
+                    .setHubId(hubId)
+                    .setTimestamp(eventTimestamp)
+                    .setSensorsState(new HashMap<>())
+                    .build();
+            snapshots.put(hubId, snapshot);
+        }
 
-        // Здесь должна быть логика агрегации состояний датчиков
-        // В реальном коде нужно объединить состояния всех датчиков этого хаба
-        return SensorsSnapshotAvro.newBuilder()
-                .setHubId(hubId)
-                // Добавьте логику заполнения sensorsState
+        Map<String, SensorStateAvro> sensors = snapshot.getSensorsState();
+        SensorStateAvro oldState = sensors.get(sensorId);
+
+        if (oldState != null && eventTimestamp < oldState.getTimestamp()) {
+            log.debug("Игнорируем устаревшее событие для датчика {}", sensorId);
+            return Optional.empty();
+        }
+        if (oldState != null && Objects.equals(oldState.getData(), event.getPayload())) {
+            log.debug("Данные от датчика {} не изменились", sensorId);
+            return Optional.empty(); // данные не изменились
+        }
+
+        SensorStateAvro newState = SensorStateAvro.newBuilder()
+                .setTimestamp(eventTimestamp)
+                .setData(event.getPayload())
                 .build();
+
+        sensors.put(sensorId, newState);
+        SensorsSnapshotAvro updatedSnapshot = SensorsSnapshotAvro.newBuilder(snapshot)
+                .setTimestamp(eventTimestamp)
+                .setSensorsState(sensors)
+                .build();
+
+        snapshots.put(hubId, updatedSnapshot);
+        log.info("Снапшот обновлен для хаба {}, датчик {}", hubId, sensorId);
+
+        return Optional.of(updatedSnapshot);  // ← пишем в Kafka
     }
 
-    // ИСПРАВЛЕНИЕ 3: проверка на изменение снапшота
-    private boolean shouldSendSnapshot(SensorsSnapshotAvro newSnapshot) {
-        if (lastSnapshot == null) return true;
-        // В реальном коде нужна более детальная проверка изменений
-        return !lastSnapshot.getHubId().equals(newSnapshot.getHubId());
-    }
-
-    private byte[] serializeToAvro(SensorsSnapshotAvro snapshot) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(out, null);
-        DatumWriter<SensorsSnapshotAvro> writer = new SpecificDatumWriter<>(SensorsSnapshotAvro.class);
-
-        writer.write(snapshot, encoder);
-        encoder.flush();
-
-        return out.toByteArray();
-    }
-
-    // ИСПРАВЛЕНИЕ 4: улучшенная обработка ошибок
+    /**
+     * Отправляет снапшот в Kafka.
+     */
     private void sendSnapshot(SensorsSnapshotAvro snapshot) {
         try {
             byte[] data = serializeToAvro(snapshot);
-            kafkaClient.sendMessage(snapshotTopic, snapshot.getHubId(), data);
+            // Синхронная отправка — ждём, пока сообщение попадёт в лидер-партицию
+            kafkaClient.getProducer().send(snapshotTopic, snapshot.getHubId(), data).get();
             log.info("Снапшот отправлен для хаба {} с {} датчиками",
                     snapshot.getHubId(), snapshot.getSensorsState().size());
         } catch (Exception e) {
             log.error("Не удалось отправить снапшот для хаба {}", snapshot.getHubId(), e);
-            // Не прерываем работу агрегатора при ошибке отправки
+            throw new RuntimeException("Failed to send snapshot", e);
         }
+    }
+
+    private byte[] serializeToAvro(SensorsSnapshotAvro snapshot) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
+
+        // Используем правильный метод для получения схемы
+        DatumWriter<SensorsSnapshotAvro> writer = new SpecificDatumWriter<>(SensorsSnapshotAvro.getClassSchema());
+        writer.write(snapshot, encoder);
+        encoder.flush();
+        outputStream.close();
+
+        return outputStream.toByteArray();
+    }
+
+    public void stop() {
+        running = false;
+        if (consumer != null) {
+            consumer.wakeup();
+        }
+        log.info("Агрегатор остановлен");
     }
 }
