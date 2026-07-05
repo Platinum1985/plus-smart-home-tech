@@ -27,5 +27,4 @@ public class BaseAvroDeserializer<T extends SpecificRecordBase> implements Deser
             throw new RuntimeException("Failed to deserialize Avro", e);
         }
     }
-
 }
