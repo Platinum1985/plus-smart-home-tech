@@ -28,7 +28,7 @@
         <kafka-clients.version>3.6.1</kafka-clients.version>
         <springdoc-openapi-starter.version>2.6.0</springdoc-openapi-starter.version>
         <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
-        <protobuf.version>3.23.4</protobuf.version>
+        <protobuf.version>3.25.3</protobuf.version>
         <grpc.version>1.64.1</grpc.version>
 
         <!--       Plugins       -->
@@ -40,7 +40,35 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-avro-serializer</artifactId>
+                <version>7.6.0</version>
+            </dependency>
 
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty-shaded</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.25.3</version>
+            </dependency>
+
+            <!-- Локальные модули -->
+            <dependency>
+                <groupId>ru.yandex.practicum</groupId>
+                <artifactId>avro-schemas</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.yandex.practicum</groupId>
+                <artifactId>proto-schemas</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
