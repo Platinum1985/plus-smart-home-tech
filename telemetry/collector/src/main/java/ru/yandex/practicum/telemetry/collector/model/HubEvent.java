@@ -31,7 +31,21 @@ public abstract class HubEvent {
     @NotBlank
     private String hubId;
     private Instant timestamp; // timestamp_ms — в миллисекундах
+    @NotNull
+    private String type;  // добавлено
 
     @NotNull
     public abstract HubEventType getType();
+
+    public void setTypeFromEnum() {
+        this.type = getType().name();
+    }  // добавлено
+
+    /**
+     * Вызывается перед сериализацией
+     */
+    public String getTypeForSerialization() {
+        return type;
+    }  // добавлено
 }
+

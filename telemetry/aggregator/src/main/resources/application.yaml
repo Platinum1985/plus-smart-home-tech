@@ -1,0 +1,15 @@
+
+spring:
+  application:
+    name: aggregator
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: aggregator-group
+
+server:
+  port: 8081
+
+# config:
+#  import: 'configserver:http://localhost:8888'
+

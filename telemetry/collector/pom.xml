@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>ru.yandex.practicum</groupId>
         <artifactId>telemetry</artifactId>
@@ -12,36 +13,81 @@
     <artifactId>collector</artifactId>
 
     <dependencies>
+        <!-- Зависимости на модули со схемами -->
         <dependency>
             <groupId>ru.yandex.practicum</groupId>
             <artifactId>avro-schemas</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>ru.yandex.practicum</groupId>
+            <artifactId>proto-schemas</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Утилиты и аннотации -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- Валидация -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
+
+        <!-- Protobuf -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.25.3</version>
+        </dependency>
+
+        <!-- gRPC -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>1.64.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>1.64.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>1.64.1</version>
+        </dependency>
+
+        <!-- Интеграция gRPC с Spring Boot -->
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-server-spring-boot-starter</artifactId>
+            <version>3.1.0.RELEASE</version>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
+            <!-- Плагин для сборки Spring Boot приложения -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.2.0</version> <!-- Укажите актуальную версию Spring Boot -->
+                <version>3.3.2</version>
                 <configuration>
                     <mainClass>ru.yandex.practicum.telemetry.collector.TelemetryCollectorApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

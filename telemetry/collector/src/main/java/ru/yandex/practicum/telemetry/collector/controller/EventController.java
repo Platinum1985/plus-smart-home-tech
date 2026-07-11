@@ -1,6 +1,7 @@
 package ru.yandex.practicum.telemetry.collector.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.telemetry.collector.model.HubEvent;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/events"/*, consumes = MediaType.APPLICATION_JSON_VALUE*/)
+@RequestMapping(path = "/events", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class EventController {
 
     // Карты для быстрого поиска обработчиков по типу события

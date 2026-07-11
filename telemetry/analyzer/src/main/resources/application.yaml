@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/smart-home-tech
+    username: smart-home-tech
+    password: smart-home-tech
+  sql:
+    init:
+      mode: always  # ← гарантирует применение схемы при старте
+  jpa:
+    hibernate:
+      ddl-auto: none  # ← отключает автоматическую генерацию DDL
+  # Если есть файлы с SQL‑скриптами для создания таблиц — укажите пути
+  # sql-init:
+  #   data-locations: classpath:db/schema.sql
+  #   scripts: classpath:db/data.sql
+
+kafka:
+  bootstrap-servers: localhost:9092
+  consumer:
+    group-id: analyzer-group
+
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+server:
+  port: 8082
