@@ -16,5 +16,15 @@ spring:
   application:
     name: analyzer
 
-server:
-  port: 0
+  config:
+    import: 'configserver:http://localhost:8888'
+
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
