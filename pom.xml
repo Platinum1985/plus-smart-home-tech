@@ -29,56 +29,24 @@
         <springdoc-openapi-starter.version>2.6.0</springdoc-openapi-starter.version>
         <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
         <protobuf.version>3.25.3</protobuf.version>
-        <grpc.version>1.64.1</grpc.version>
+        <grpc.version>1.63.0</grpc.version>
+        <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
 
         <!--       Plugins       -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <avro-maven-plugin.version>${avro.version}</avro-maven-plugin.version>
         <protobuf-plugin.version>2.4.0</protobuf-plugin.version>
-        <spring-cloud-dependencies.version>2023.0.0</spring-cloud-dependencies.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>io.confluent</groupId>
-                <artifactId>kafka-avro-serializer</artifactId>
-                <version>7.6.0</version>
-            </dependency>
 
             <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-netty-shaded</artifactId>
-                <version>${grpc.version}</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>3.3.2</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>3.25.3</version>
-            </dependency>
-
-            <!-- Локальные модули -->
-            <dependency>
-                <groupId>ru.yandex.practicum</groupId>
-                <artifactId>avro-schemas</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>ru.yandex.practicum</groupId>
-                <artifactId>proto-schemas</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
-            </dependency>
-            <dependency>
-                <groupId>net.devh</groupId>
-                <artifactId>grpc-client-spring-boot-starter</artifactId>
-                <version>${grpc-spring-boot-starter.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
@@ -104,9 +72,17 @@
                 <version>${grpc-spring-boot-starter.version}</version>
             </dependency>
 
+            <!-- gRPC Server -->
             <dependency>
                 <groupId>net.devh</groupId>
                 <artifactId>grpc-server-spring-boot-starter</artifactId>
+                <version>${grpc-spring-boot-starter.version}</version>
+            </dependency>
+
+            <!-- gRPC клиент -->
+            <dependency>
+                <groupId>net.devh</groupId>
+                <artifactId>grpc-client-spring-boot-starter</artifactId>
                 <version>${grpc-spring-boot-starter.version}</version>
             </dependency>
 
@@ -122,6 +98,42 @@
                 <version>${grpc.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty-shaded</artifactId>
+                <version>${grpc.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+
+            <!--   Собственные модули   -->
+
+            <dependency>
+                <groupId>ru.yandex.practicum</groupId>
+                <artifactId>avro-schemas</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ru.yandex.practicum</groupId>
+                <artifactId>proto-schemas</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+            <!-- Confluent (Kafka Avro) -->
+            <dependency>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-avro-serializer</artifactId>
+                <version>7.4.0</version>
+            </dependency>
+
+            <!-- Protobuf -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+
             <!-- Spring Cloud Config -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -131,7 +143,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <!--    / GRPC dependencies management        -->
         </dependencies>
     </dependencyManagement>
 
