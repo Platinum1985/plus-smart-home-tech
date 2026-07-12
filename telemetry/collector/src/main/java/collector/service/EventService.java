@@ -1,6 +1,5 @@
 package collector.service;
 
-import collector.kafka.KafkaClient;
 import collector.kafka.ProtoKafkaClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
