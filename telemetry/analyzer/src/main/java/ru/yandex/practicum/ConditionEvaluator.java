@@ -2,14 +2,13 @@ package ru.yandex.practicum;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.grpc.telemetry.event.ConditionOperationProto;
-import ru.yandex.practicum.grpc.telemetry.event.ConditionTypeProto;
+import ru.yandex.practicum.grpc.telemetry.collector.ConditionOperationProto;
+import ru.yandex.practicum.grpc.telemetry.collector.ConditionTypeProto;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.model.Condition;
 import ru.yandex.practicum.model.ScenarioCondition;
 
 import java.util.Map;
-
 
 @Log4j2
 @Component

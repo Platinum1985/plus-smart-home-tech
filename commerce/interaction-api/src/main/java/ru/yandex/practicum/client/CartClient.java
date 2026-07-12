@@ -21,7 +21,7 @@ public interface CartClient {
     ShoppingCartDto addProductFromCart(
             @RequestParam String username,
             @RequestBody Map<UUID, Long> productIds
-    );
+            );
 
     @DeleteMapping
     void removeCart(

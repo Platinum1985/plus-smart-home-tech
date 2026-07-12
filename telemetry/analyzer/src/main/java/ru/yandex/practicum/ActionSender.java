@@ -1,14 +1,15 @@
 package ru.yandex.practicum;
 
+import com.google.protobuf.Empty;
 import com.google.protobuf.Timestamp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.grpc.telemetry.event.ActionTypeProto;
-import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
-import ru.yandex.practicum.grpc.telemetry.event.DeviceActionRequest;
-import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc;
+import ru.yandex.practicum.grpc.telemetry.collector.ActionTypeProto;
+import ru.yandex.practicum.grpc.telemetry.collector.DeviceActionRequest;
+import ru.yandex.practicum.grpc.telemetry.collector.DeviceActionProto;
+import ru.yandex.practicum.grpc.telemetry.hubrouter.HubRouterControllerGrpc.HubRouterControllerBlockingStub;
 import ru.yandex.practicum.model.Action;
 import ru.yandex.practicum.model.ScenarioAction;
 
@@ -20,7 +21,7 @@ import java.time.Instant;
 public class ActionSender {
 
     @GrpcClient("hub-router")
-    private HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient;
+    private HubRouterControllerBlockingStub hubRouterClient;
 
     public void sendAction(String hubId, String scenarioName, ScenarioAction scenarioAction) {
         Action actionEntity = scenarioAction.getAction();
@@ -44,7 +45,7 @@ public class ActionSender {
         log.info("Попытка отправить действие: hub={}, scenario={}, action={}", hubId, scenarioName, scenarioAction.getAction().getType());
 
         try {
-            com.google.protobuf.Empty response = hubRouterClient.handleDeviceAction(request);
+            Empty response = hubRouterClient.handleDeviceAction(request);
             log.info("Действие отправлено: сценарий={}, тип действия={}", scenarioName, actionEntity.getType());
         } catch (Exception e) {
             log.error("Не удалось отправить действие для сценария {}", scenarioName, e);

@@ -3,9 +3,9 @@ package ru.yandex.practicum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.model.Scenario;
 import ru.yandex.practicum.model.ScenarioAction;
+import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 
 import java.util.ArrayList;
 import java.util.List;

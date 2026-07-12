@@ -84,7 +84,7 @@
             <artifactId>protobuf-java</artifactId>
         </dependency>
 
-        <!--    Spring Cloud Config    -->
+<!--    Spring Cloud Config    -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
@@ -95,7 +95,7 @@
             <artifactId>spring-retry</artifactId>
         </dependency>
 
-        <!--    Клиент Eureka    -->
+<!--    Клиент Eureka    -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>

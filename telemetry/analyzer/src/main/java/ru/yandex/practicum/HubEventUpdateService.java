@@ -3,13 +3,16 @@ package ru.yandex.practicum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.grpc.telemetry.event.ConditionOperationProto;
+import ru.yandex.practicum.grpc.telemetry.collector.ConditionOperationProto;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.model.*;
+import ru.yandex.practicum.model.ScenarioCondition.ScenarioConditionId;
 import ru.yandex.practicum.repository.*;
+import ru.yandex.practicum.model.ScenarioAction.ScenarioActionId;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Slf4j
 @Service
@@ -85,7 +88,7 @@ public class HubEventUpdateService {
 
             conditionsToSave.add(
                     ScenarioCondition.builder()
-                            .id(ScenarioCondition.ScenarioConditionId.builder()
+                            .id(ScenarioConditionId.builder()
                                     .scenarioId(scenario.getId())
                                     .sensorId(sensor.getId())
                                     .conditionId(condition.getId())
@@ -113,7 +116,7 @@ public class HubEventUpdateService {
 
             actionsToSave.add(
                     ScenarioAction.builder()
-                            .id(ScenarioAction.ScenarioActionId.builder()
+                            .id(ScenarioActionId.builder()
                                     .scenarioId(scenario.getId())
                                     .sensorId(sensor.getId())
                                     .actionId(action.getId())

@@ -15,8 +15,8 @@ public class ShoppingCartMapper {
                 .shoppingCartId(shoppingCart.getShoppingCartId())
                 .products(shoppingCart.getItems().stream()
                         .collect(Collectors.toMap(
-                                CartItem::getProductId,
-                                CartItem::getQuantity )
+                                        CartItem::getProductId,
+                                        CartItem::getQuantity )
                         )
                 ).build();
     }

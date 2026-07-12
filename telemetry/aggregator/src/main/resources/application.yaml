@@ -25,5 +25,3 @@ spring:
       retry:
         useRandomPolicy: true
         max-interval: 6000
-
-
