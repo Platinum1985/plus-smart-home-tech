@@ -1,0 +1,21 @@
+grpc:
+  server:
+    port: 59090
+  client:
+    collector:
+      address: 'static://localhost:9090'
+      negotiationType: PLAINTEXT
+
+server:
+  port: 0
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+
+spring:
+  kafka:
+    bootstrap-servers: 'localhost:9092'
+  topics:
+    sensor: 'telemetry.sensors.v1'
+    hub: 'telemetry.hub.v1'

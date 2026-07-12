@@ -1,0 +1,24 @@
+grpc:
+  server:
+    port: 59080
+  client:
+    warehouse:
+      address: 'static://localhost:59080'
+      negotiationType: PLAINTEXT
+
+server:
+  port: 0
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:postgresql://localhost:5432/warehouse
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
