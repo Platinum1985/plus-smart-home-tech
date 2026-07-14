@@ -27,7 +27,6 @@ public class ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
     private final CartItemRepository cartItemRepository;
-    private final WarehouseClient warehouseClient;
 
     public ShoppingCartDto getShoppingCart(String username) {
         // TODO: реализовать получение корзины
