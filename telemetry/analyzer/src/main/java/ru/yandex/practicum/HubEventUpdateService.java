@@ -10,9 +10,8 @@ import ru.yandex.practicum.model.ScenarioCondition.ScenarioConditionId;
 import ru.yandex.practicum.repository.*;
 import ru.yandex.practicum.model.ScenarioAction.ScenarioActionId;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -74,29 +73,6 @@ public class HubEventUpdateService {
                         .build()
                 );
 
-        // Шаг 1: собираем ID сенсоров из условий и действий
-        Set<String> allSensorIds = new HashSet<>(added.getConditions().stream()
-                .map(ScenarioConditionAvro::getSensorId)
-                .collect(Collectors.toList()));
-        allSensorIds.addAll(added.getActions().stream()
-                .map(DeviceActionAvro::getSensorId)
-                .collect(Collectors.toList()));
-
-        // Шаг 2: выполняем один запрос к БД для получения всех сенсоров
-        List<Sensor> sensors = sensorRep.findByIdIn(allSensorIds);
-
-        // Шаг 3: создаём маппинг «ID сенсора → сенсор» для быстрого доступа
-        Map<String, Sensor> sensorMap = sensors.stream()
-                .collect(Collectors.toMap(Sensor::getId, Function.identity()));
-
-        // Шаг 4: проверяем, что все сенсоры найдены
-        if (sensorMap.size() < allSensorIds.size()) {
-            List<String> missingIds = allSensorIds.stream()
-                    .filter(id -> !sensorMap.containsKey(id))
-                    .collect(Collectors.toList());
-            throw new RuntimeException("Сенсоры не найдены: " + missingIds);
-        }
-
         // Сохраняем условия
         List<ScenarioCondition> conditionsToSave = new ArrayList<>();
         for (ScenarioConditionAvro condAvro : added.getConditions()) {
@@ -108,7 +84,7 @@ public class HubEventUpdateService {
                             .build()
             );
 
-            Sensor sensor = sensorMap.get(condAvro.getSensorId()); // берём сенсор из маппинга
+            Sensor sensor = getSensor(condAvro.getSensorId());
 
             conditionsToSave.add(
                     ScenarioCondition.builder()
@@ -136,7 +112,7 @@ public class HubEventUpdateService {
                             .build()
             );
 
-            Sensor sensor = sensorMap.get(actionAvro.getSensorId()); // берём сенсор из маппинга
+            Sensor sensor = getSensor(actionAvro.getSensorId());
 
             actionsToSave.add(
                     ScenarioAction.builder()
@@ -171,5 +147,10 @@ public class HubEventUpdateService {
             return (Boolean) value ? 1 : 0;
         }
         return null;
+    }
+
+    private Sensor getSensor(String id) {
+        return sensorRep.findById(id)
+                .orElseThrow(() -> new RuntimeException("Сенсор не найден: " + id));
     }
 }

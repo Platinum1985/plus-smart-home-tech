@@ -1,14 +1,11 @@
 package ru.yandex.practicum.dto.warehouse;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Service;
 
 @Builder
 @Getter
-@Service
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class DimensionDto {

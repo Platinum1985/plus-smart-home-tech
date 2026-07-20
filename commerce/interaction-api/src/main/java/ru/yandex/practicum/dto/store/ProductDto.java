@@ -1,9 +1,6 @@
 package ru.yandex.practicum.dto.store;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.state.ProductCategory;
 import ru.yandex.practicum.state.ProductState;
@@ -13,7 +10,7 @@ import java.util.UUID;
 
 @Builder
 @Getter
-@Service
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDto {

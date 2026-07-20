@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.client.WarehouseClient;
 import ru.yandex.practicum.dto.cart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.cart.ShoppingCartDto;
@@ -27,12 +29,20 @@ public class ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
     private final CartItemRepository cartItemRepository;
+    private final WarehouseClient warehouseClient;
 
     public ShoppingCartDto getShoppingCart(String username) {
         // TODO: реализовать получение корзины
         ShoppingCart cart = getOrCreateActiveCart(username);
         return ShoppingCartMapper.toDto(cart);
     }
+
+    public ShoppingCart getCartById(UUID shoppingCartId) {
+        // TODO: реализовать получение корзины по id
+        ShoppingCart cart = shoppingCartRepository.getReferenceById(shoppingCartId);
+        return cart;
+    }
+
 
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Long> products) {
         // TODO: реализовать добавление товаров в корзину

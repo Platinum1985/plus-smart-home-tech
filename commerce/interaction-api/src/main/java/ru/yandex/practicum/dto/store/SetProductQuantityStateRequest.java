@@ -1,9 +1,6 @@
 package ru.yandex.practicum.dto.store;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.state.QuantityState;
 
@@ -11,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-@Service
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SetProductQuantityStateRequest {
