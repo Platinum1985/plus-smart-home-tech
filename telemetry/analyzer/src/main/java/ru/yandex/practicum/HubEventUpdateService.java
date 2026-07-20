@@ -3,13 +3,17 @@ package ru.yandex.practicum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.grpc.telemetry.event.ConditionOperationProto;
+import ru.yandex.practicum.grpc.telemetry.collector.ConditionOperationProto;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.model.*;
+import ru.yandex.practicum.model.ScenarioCondition.ScenarioConditionId;
 import ru.yandex.practicum.repository.*;
+import ru.yandex.practicum.model.ScenarioAction.ScenarioActionId;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -70,6 +74,29 @@ public class HubEventUpdateService {
                         .build()
                 );
 
+        // Шаг 1: собираем ID сенсоров из условий и действий
+        Set<String> allSensorIds = new HashSet<>(added.getConditions().stream()
+                .map(ScenarioConditionAvro::getSensorId)
+                .collect(Collectors.toList()));
+        allSensorIds.addAll(added.getActions().stream()
+                .map(DeviceActionAvro::getSensorId)
+                .collect(Collectors.toList()));
+
+        // Шаг 2: выполняем один запрос к БД для получения всех сенсоров
+        List<Sensor> sensors = sensorRep.findByIdIn(allSensorIds);
+
+        // Шаг 3: создаём маппинг «ID сенсора → сенсор» для быстрого доступа
+        Map<String, Sensor> sensorMap = sensors.stream()
+                .collect(Collectors.toMap(Sensor::getId, Function.identity()));
+
+        // Шаг 4: проверяем, что все сенсоры найдены
+        if (sensorMap.size() < allSensorIds.size()) {
+            List<String> missingIds = allSensorIds.stream()
+                    .filter(id -> !sensorMap.containsKey(id))
+                    .collect(Collectors.toList());
+            throw new RuntimeException("Сенсоры не найдены: " + missingIds);
+        }
+
         // Сохраняем условия
         List<ScenarioCondition> conditionsToSave = new ArrayList<>();
         for (ScenarioConditionAvro condAvro : added.getConditions()) {
@@ -81,11 +108,11 @@ public class HubEventUpdateService {
                             .build()
             );
 
-            Sensor sensor = getSensor(condAvro.getSensorId());
+            Sensor sensor = sensorMap.get(condAvro.getSensorId()); // берём сенсор из маппинга
 
             conditionsToSave.add(
                     ScenarioCondition.builder()
-                            .id(ScenarioCondition.ScenarioConditionId.builder()
+                            .id(ScenarioConditionId.builder()
                                     .scenarioId(scenario.getId())
                                     .sensorId(sensor.getId())
                                     .conditionId(condition.getId())
@@ -109,11 +136,11 @@ public class HubEventUpdateService {
                             .build()
             );
 
-            Sensor sensor = getSensor(actionAvro.getSensorId());
+            Sensor sensor = sensorMap.get(actionAvro.getSensorId()); // берём сенсор из маппинга
 
             actionsToSave.add(
                     ScenarioAction.builder()
-                            .id(ScenarioAction.ScenarioActionId.builder()
+                            .id(ScenarioActionId.builder()
                                     .scenarioId(scenario.getId())
                                     .sensorId(sensor.getId())
                                     .actionId(action.getId())
@@ -144,10 +171,5 @@ public class HubEventUpdateService {
             return (Boolean) value ? 1 : 0;
         }
         return null;
-    }
-
-    private Sensor getSensor(String id) {
-        return sensorRep.findById(id)
-                .orElseThrow(() -> new RuntimeException("Сенсор не найден: " + id));
     }
 }

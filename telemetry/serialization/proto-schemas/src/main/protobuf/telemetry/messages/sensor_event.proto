@@ -3,14 +3,15 @@ syntax = "proto3";
 package telemetry.message.event;
 
 import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
-option java_package = "ru.yandex.practicum.grpc.telemetry.event";
+option java_package = "ru.yandex.practicum.grpc.telemetry.collector";
 
 message SensorEventProto {
-  string id = 1; // идентификатор датчика
+  string id = 1;
   google.protobuf.Timestamp timestamp = 2; // таймстемп события
   string hubId = 3; // идентификатор связанного хаба
-  oneof payload {// данные события от конкретного устройства
+  oneof payload { // данные события от конкретного устройства
     MotionSensorProto motion_sensor = 4;            // данные события датчика движения
     TemperatureSensorProto temperature_sensor = 5;  // данные события температурного датчика
     LightSensorProto light_sensor = 6;              // данные события датчика освещения

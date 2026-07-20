@@ -1,0 +1,24 @@
+grpc:
+  server:
+    port: 59082
+  client:
+    shopping-cart:
+      address: 'static://localhost:59082'
+      negotiationType: PLAINTEXT
+
+server:
+  port: 0
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cart
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver

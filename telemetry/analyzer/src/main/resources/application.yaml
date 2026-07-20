@@ -1,32 +1,30 @@
-spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/smart-home-tech
-    username: smart-home-tech
-    password: smart-home-tech
-  sql:
-    init:
-      mode: always  # ← гарантирует применение схемы при старте
-  jpa:
-    hibernate:
-      ddl-auto: none  # ← отключает автоматическую генерацию DDL
-  # Если есть файлы с SQL‑скриптами для создания таблиц — укажите пути
-  # sql-init:
-  #   data-locations: classpath:db/schema.sql
-  #   scripts: classpath:db/data.sql
-
-kafka:
-  bootstrap-servers: localhost:9092
-  consumer:
-    group-id: analyzer-group
-
-grpc:
+eureka:
   client:
-    hub-router:
-      address: 'static://localhost:59090'
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
+    healthcheck:
+      enabled: true
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    prefer-ip-address: true
 
-server:
-  port: 8082
+spring:
+  application:
+    name: analyzer
+
+  config:
+    import: 'configserver:http://localhost:8888'
+
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        serviceId: config-server
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000

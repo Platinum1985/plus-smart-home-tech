@@ -11,16 +11,12 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.deserialize.SensorEventDeserializer;
 import ru.yandex.practicum.kafka.KafkaClient;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
-import org.springframework.context.event.EventListener;
-
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,24 +45,33 @@ public class AggregationStarter {
 
     private final Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
 
-    @EventListener(ContextRefreshedEvent.class)
     public void start() {
-        // существующая логика без изменений
         try {
             consumer = kafkaClient.getConsumer();
             consumer.subscribe(Collections.singleton(sensorTopic));
+
+            // Отключаем авто-коммит
+            consumer.commitSync(); // инициализация
+
             log.info("Агрегация запущена, слушаем топик: {}", sensorTopic);
 
             while (running) {
                 ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofMillis(1000));
+
                 for (ConsumerRecord<String, byte[]> record : records) {
                     SensorEventAvro event = sensorEventDeserializer.deserialize(record.topic(), record.value());
                     if (event != null) {
                         Optional<SensorsSnapshotAvro> updatedSnapshot = updateState(event);
-                        updatedSnapshot.ifPresent(this::sendSnapshot);
+                        if (updatedSnapshot.isPresent()) {
+                            sendSnapshot(updatedSnapshot.get());
+                        }
                     }
                 }
+
+                // Принудительно отправляем все буферизованные сообщения
                 kafkaClient.getProducer().flush();
+
+                // Коммитим offset только после успешной отправки всех снапшотов
                 consumer.commitSync();
             }
         } catch (WakeupException e) {
@@ -79,7 +84,7 @@ public class AggregationStarter {
     private Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
         String hubId = event.getHubId();
         String sensorId = event.getId();
-        long eventTimestamp = event.getTimestamp().toEpochMilli(); // !!! миллисек
+        long eventTimestamp = event.getTimestamp();
 
         SensorsSnapshotAvro snapshot = snapshots.get(hubId);
         if (snapshot == null) {
@@ -124,10 +129,10 @@ public class AggregationStarter {
      * Отправляет снапшот в Kafka.
      */
     private void sendSnapshot(SensorsSnapshotAvro snapshot) {
-        KafkaTemplate<String, byte[]> producer = kafkaClient.getProducer();
         try {
             byte[] data = serializeToAvro(snapshot);
-            producer.send(snapshotTopic, snapshot.getHubId(), data).get();
+            // Синхронная отправка — ждём, пока сообщение попадёт в лидер-партицию
+            kafkaClient.getProducer().send(snapshotTopic, snapshot.getHubId(), data).get();
             log.info("Снапшот отправлен для хаба {} с {} датчиками",
                     snapshot.getHubId(), snapshot.getSensorsState().size());
         } catch (Exception e) {
@@ -139,13 +144,9 @@ public class AggregationStarter {
     private byte[] serializeToAvro(SensorsSnapshotAvro snapshot) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
-
-        // Используем правильный метод для получения схемы
         DatumWriter<SensorsSnapshotAvro> writer = new SpecificDatumWriter<>(SensorsSnapshotAvro.getClassSchema());
         writer.write(snapshot, encoder);
         encoder.flush();
-        outputStream.close();
-
         return outputStream.toByteArray();
     }
 

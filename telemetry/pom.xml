@@ -19,4 +19,12 @@
         <module>analyzer</module>
     </modules>
 
+    <dependencies>
+        <!--        Lombok          -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

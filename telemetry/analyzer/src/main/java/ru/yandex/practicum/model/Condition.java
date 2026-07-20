@@ -2,7 +2,7 @@ package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.yandex.practicum.grpc.telemetry.event.ConditionOperationProto;
+import ru.yandex.practicum.grpc.telemetry.collector.ConditionOperationProto;
 
 import java.util.ArrayList;
 import java.util.List;

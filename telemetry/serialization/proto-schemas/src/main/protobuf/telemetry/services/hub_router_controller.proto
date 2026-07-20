@@ -1,34 +1,14 @@
-// Указываем версию синтаксиса Protocol Buffers — proto3. Это стандарт для описания структур данных и gRPC‑сервисов.
-
 syntax = "proto3";
 
-// Задаём пакет (пространство имён) для всех типов в этом файле. // Помогает избежать конфликтов имён и структурировать код. // Все типы здесь будут принадлежать пакету telemetry.service.hubrouter.
 package telemetry.service.hubrouter;
 
-// Импортируем стандартный файл empty.proto из библиотеки Protobuf. Содержит определение типа google.protobuf.Empty — «пустой» ответ, который часто используют, если метод не возвращает данных.
-
 import "google/protobuf/empty.proto";
-
-// Подключаем собственный .proto‑файл с описанием сообщений телеметрии. Теперь можно использовать типы из hub_event.proto (например, сообщения событий).
-
 import "telemetry/messages/hub_event.proto";
 
-// Опция задаёт Java‑пакет для сгенерированных классов. Когда код скомпилируется, Java‑классы попадут в этот пакет.
-
 option java_package = "ru.yandex.practicum.grpc.telemetry.hubrouter";
-
-// Определяем имя внешнего Java‑класса, который будет сгенерирован. Этот класс станет оболочкой для всех сообщений и сервиса в файле.
-
 option java_outer_classname = "HubRouterControllerProto";
 
-// Объявляем gRPC‑сервис с именем HubRouterController. По сути — контракт: перечисляем методы, которые можно вызвать удалённо.
-
 service HubRouterController {
-  // Описываем метод handleDeviceAction:
-  // - rpc (Remote Procedure Call) — указание, что метод можно вызывать удалённо;
-  // - параметр — объект DeviceActionRequest из пакета message.event;
-  // - возвращает пустой ответ (google.protobuf.Empty), т. е. только статус «успех/ошибка».
   rpc handleDeviceAction (message.event.DeviceActionRequest)
       returns (google.protobuf.Empty);
 }
- 

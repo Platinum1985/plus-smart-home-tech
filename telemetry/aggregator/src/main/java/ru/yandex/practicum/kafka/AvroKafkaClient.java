@@ -1,6 +1,5 @@
 package ru.yandex.practicum.kafka;
 
-
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -42,7 +41,7 @@ public class AvroKafkaClient implements KafkaClient {
     @Value("${spring.kafka.consumer.properties.heartbeat.interval.ms:3000}")
     private int heartbeatIntervalMs;
 
-    @Value("${spring.kafka.consumer.properties.max.poll.interval.ms:300000}") //300 000->10 000 ТЗМЕНИЛ
+    @Value("${spring.kafka.consumer.properties.max.poll.interval.ms:300000}")
     private int maxPollIntervalMs;
 
     @Value("${spring.kafka.consumer.properties.max.poll.records:100}")

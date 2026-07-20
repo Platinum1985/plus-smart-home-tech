@@ -2,6 +2,7 @@ package ru.yandex.practicum.processor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,15 +20,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SnapshotProcessor implements Runnable {
 
-    @Value("${spring.kafka.topics.snapshot:telemetry.snapshots.v1}")
+    @Value("${kafka.topics.snapshot:telemetry.snapshots.v1}")
     private String snapshotTopic;
 
     private final KafkaClient kafkaClient;
     private final SnapshotDeserializer snapshotDeserializer;
     private final SnapshotEvaluationService evaluationService;
 
-    // Исправлено: было Consumer<String, byte[]>, теперь — полный путь к Kafka Consumer
-    private org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer;
+    private Consumer<String, byte[]> consumer;
     private volatile boolean running = true;
 
     @Override

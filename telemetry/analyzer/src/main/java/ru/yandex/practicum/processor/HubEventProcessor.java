@@ -2,15 +2,15 @@ package ru.yandex.practicum.processor;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.HubEventUpdateService;
 import ru.yandex.practicum.deserialize.HubEventDeserializer;
 import ru.yandex.practicum.kafka.KafkaClient;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+import ru.yandex.practicum.HubEventUpdateService;
 
 import java.time.Duration;
 import java.util.List;
@@ -27,8 +27,7 @@ public class HubEventProcessor implements Runnable {
     private final HubEventDeserializer hubEventDeserializer;
     private final HubEventUpdateService updateService;
 
-    // Исправлено: было Consumer<String, byte[]>, теперь — полный путь к Kafka Consumer
-    private org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer;
+    private Consumer<String, byte[]> consumer;
     private volatile boolean running = true;
 
     @Override
@@ -53,26 +52,13 @@ public class HubEventProcessor implements Runnable {
                     updateService.processHubEvent(event);
                 }
 
-                // Добавлена обработка исключений для commitSync
-                try {
-                    consumer.commitSync();
-                } catch (Exception e) {
-                    log.error("Ошибка при коммите офсетов", e);
-                }
+                consumer.commitSync();
             }
-
-        } catch (WakeupException e) {
-            // Игнорируем WakeupException — это ожидаемое исключение при остановке
-            log.info("Consumer разбужен для остановки");
         } catch (Exception e) {
-            log.error("Неожиданная ошибка в HubEventProcessor", e);
+            log.error("Ошибка в HubEventProcessor", e);
         } finally {
             if (consumer != null) {
-                try {
-                    consumer.close();
-                } catch (Exception e) {
-                    log.error("Ошибка при закрытии consumer", e);
-                }
+                consumer.close();
                 log.info("Consumer для топика {} закрыт", hubTopic);
             }
         }

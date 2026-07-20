@@ -3,8 +3,9 @@ syntax = "proto3";
 package telemetry.message.event;
 
 import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
-option java_package = "ru.yandex.practicum.grpc.telemetry.event";
+option java_package = "ru.yandex.practicum.grpc.telemetry.collector";
 
 message HubEventProto {
   string hub_id = 1; // идентификатор хаба

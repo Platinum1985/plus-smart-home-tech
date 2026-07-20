@@ -1,14 +1,15 @@
 package ru.yandex.practicum.kafka;
 
-import org.apache.kafka.common.serialization.ByteArraySerializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -22,7 +23,8 @@ import java.util.Map;
 @Component
 public class AvroKafkaClient implements KafkaClient {
 
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092"; // жёстко заданный адрес
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
 
     @Value("${spring.kafka.consumer.group-id:analyzer-group}")
     private String groupId;
@@ -42,7 +44,7 @@ public class AvroKafkaClient implements KafkaClient {
     @Value("${spring.kafka.consumer.properties.max.poll.interval.ms:300000}")
     private int maxPollIntervalMs;
 
-    @Value("${spring.kafka.consumer.properties.max.poll.records:10}")
+    @Value("${spring.kafka.consumer.properties.max.poll.records:100}")
     private int maxPollRecords;
 
     @Value("${spring.kafka.consumer.properties.request.timeout.ms:20000}")
@@ -70,7 +72,7 @@ public class AvroKafkaClient implements KafkaClient {
     private int retries;
 
     private KafkaTemplate<String, byte[]> producer;
-    private org.apache.kafka.clients.consumer.Consumer<String, byte[]> consumer;
+    private Consumer<String, byte[]> consumer;
 
     @Override
     public KafkaTemplate<String, byte[]> getProducer() {
@@ -83,7 +85,7 @@ public class AvroKafkaClient implements KafkaClient {
         return producer;
     }
 
-    public org.apache.kafka.clients.consumer.Consumer<String, byte[]> getConsumer() {
+    public Consumer<String, byte[]> getConsumer() {
         return new KafkaConsumer<>(createConsumerProps());
     }
 
@@ -109,7 +111,7 @@ public class AvroKafkaClient implements KafkaClient {
 
     private Map<String, Object> createProducerProps() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS); // используем константу
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
         props.put(ProducerConfig.ACKS_CONFIG, acks);
@@ -120,7 +122,7 @@ public class AvroKafkaClient implements KafkaClient {
     private Map<String, Object> createConsumerProps() {
         Map<String, Object> props = new HashMap<>();
 
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS); // используем константу
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);

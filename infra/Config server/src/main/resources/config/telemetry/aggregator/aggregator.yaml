@@ -1,0 +1,42 @@
+grpc:
+  server:
+    port: 59095
+  client:
+    collector:
+      address: 'static://localhost:9099'
+      negotiationType: PLAINTEXT
+
+server:
+  port: 0
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+
+spring:
+  kafka:
+    bootstrap-servers: 'localhost:9092'
+    consumer:
+      group-id: aggregator-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      properties:
+        session.timeout.ms: 10000
+        heartbeat.interval.ms: 3000
+        max.poll.interval.ms: 300000
+        max.poll.records: 100
+        request.timeout.ms: 20000
+        reconnect.backoff.ms: 50
+        reconnect.backoff.max.ms: 1000
+        fetch.min.bytes: 1
+        fetch.max.wait.ms: 500
+        max.partition.fetch.bytes: 1048576
+    producer:
+      properties:
+        acks: all
+        retries: 3
+  topics:
+    sensor: 'telemetry.sensors.v1'
+    snapshot: 'telemetry.snapshots.v1'
