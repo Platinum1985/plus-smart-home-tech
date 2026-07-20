@@ -1,8 +1,6 @@
 package ru.yandex.practicum.dto.warehouse;
 
 import lombok.*;
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails;
-import org.springframework.stereotype.Service;
 
 @Builder
 @Getter

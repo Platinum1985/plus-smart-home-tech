@@ -1,7 +1,6 @@
 package ru.yandex.practicum.dto.store;
 
 import lombok.*;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.state.ProductCategory;
 import ru.yandex.practicum.state.ProductState;
 import ru.yandex.practicum.state.QuantityState;

@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.client.WarehouseClient;
 import ru.yandex.practicum.dto.cart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.cart.ShoppingCartDto;
@@ -117,7 +115,7 @@ public class ShoppingCartService {
                     .orElseThrow(() -> new ProductNotFoundException("Корзина не найдена"));
             log.info("Найдена активная корзина");
             return cart;
-        }catch (ProductNotFoundException e) {
+        } catch (ProductNotFoundException e) {
             ShoppingCart newCart = ShoppingCart.builder()
                     .shoppingCartId(UUID.randomUUID())
                     .username(username)

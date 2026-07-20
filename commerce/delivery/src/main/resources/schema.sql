@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS deliveries
+create TABLE IF NOT EXISTS deliveries
 (
     id              UUID PRIMARY KEY,
     order_id        UUID        NOT NULL UNIQUE,

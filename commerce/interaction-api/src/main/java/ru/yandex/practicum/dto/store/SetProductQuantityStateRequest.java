@@ -1,7 +1,6 @@
 package ru.yandex.practicum.dto.store;
 
 import lombok.*;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.state.QuantityState;
 
 import java.util.UUID;

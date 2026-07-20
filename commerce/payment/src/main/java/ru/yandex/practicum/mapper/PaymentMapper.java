@@ -15,5 +15,4 @@ public class PaymentMapper {
                 .feeTotal(payment.getFeeTotal())
                 .build();
     }
-
 }

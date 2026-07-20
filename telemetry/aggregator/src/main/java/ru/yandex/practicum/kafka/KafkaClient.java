@@ -6,6 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 public interface KafkaClient {
 
     KafkaTemplate<String, byte[]> getProducer();
+
     Consumer<String, byte[]> getConsumer();
 
 }

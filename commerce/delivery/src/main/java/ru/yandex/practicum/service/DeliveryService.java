@@ -7,7 +7,6 @@ import ru.yandex.practicum.client.OrderClient;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.delivery.entity.Delivery;
 import ru.yandex.practicum.dto.order.OrderDto;
-import ru.yandex.practicum.dto.order.entity.Order;
 import ru.yandex.practicum.exception.NoDeliveryFoundException;
 import ru.yandex.practicum.mapper.DeliveryMapper;
 import ru.yandex.practicum.repository.DeliveryRepository;

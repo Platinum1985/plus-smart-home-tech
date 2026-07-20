@@ -33,7 +33,7 @@ public class PaymentService {
         deliveryTotal = orderDto.getDeliveryPrice();
         productTotal = orderDto.getProductPrice();
 
-        if(totalPrice == null ||
+        if (totalPrice == null ||
                 deliveryTotal == null ||
                 productTotal == null)
             throw new NotEnoughInfoInOrderToCalculateException("Не хватает данных платежа");
