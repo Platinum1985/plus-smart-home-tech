@@ -1,0 +1,23 @@
+eureka:
+  client:
+    fetchRegistry: true
+    registryFetchIntervalSeconds: 5
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+spring:
+  application:
+    name: gateway
+
+  config:
+    import: 'configserver:http://localhost:8888/'
+
+  cloud:
+    config:
+      discovery:
+        enabled: false
+        serviceId: config-server
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000

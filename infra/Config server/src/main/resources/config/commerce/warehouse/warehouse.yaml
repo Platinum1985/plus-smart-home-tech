@@ -16,7 +16,7 @@ logging:
 spring:
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
   datasource:
     url: jdbc:postgresql://localhost:5432/warehouse
     username: postgres

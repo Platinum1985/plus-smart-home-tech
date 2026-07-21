@@ -22,9 +22,7 @@ import ru.yandex.practicum.state.ProductCategory;
 import ru.yandex.practicum.state.ProductState;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -158,6 +156,18 @@ public class ShoppingStoreService {
             log.debug("Произошла ошибка, статус количества товара не получилось обновить");
             return false;
         }
+    }
+
+    public Double getProductPrice(Map<UUID, Long> productIdsAndQuantity) {
+        Set<UUID> productIds = productIdsAndQuantity.keySet();
+        List<Product> products = productRepository.findAllById(productIds);
+
+        // Подсчет общей суммы
+        Double totalPrice = products.stream()
+                .map(product -> product.getPrice() * productIdsAndQuantity.getOrDefault(product.getProductId(), 0L))
+                .reduce(0.0, Double::sum);
+
+        return totalPrice;
     }
 
     public ProductDto getProduct(UUID productId) {

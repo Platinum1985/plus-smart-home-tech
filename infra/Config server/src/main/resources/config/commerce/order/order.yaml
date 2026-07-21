@@ -1,0 +1,16 @@
+server:
+  port: 0
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver

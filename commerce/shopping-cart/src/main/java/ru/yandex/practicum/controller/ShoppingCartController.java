@@ -1,9 +1,10 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.cart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.cart.ShoppingCartDto;
+import ru.yandex.practicum.dto.cart.entity.ShoppingCart;
 import ru.yandex.practicum.service.ShoppingCartService;
 
 import java.util.List;
@@ -21,9 +22,18 @@ public class ShoppingCartController {
      * Получение актуальной корзины для авторизованного пользователя
      */
     @GetMapping
-    public ShoppingCartDto getShoppingCart(@RequestParam String username) {
+    public ShoppingCartDto getActualCart(@RequestParam String username) {
         return shoppingCartService.getShoppingCart(username);
     }
+
+    /**
+     * Получение актуальной корзины для авторизованного пользователя по id
+     */
+    @GetMapping("/{shoppingCartId}")
+    public ShoppingCart getCartById(@PathVariable UUID shoppingCartId) {
+        return shoppingCartService.getCartById(shoppingCartId);
+    }
+
 
     /**
      * Добавление товаров в корзину

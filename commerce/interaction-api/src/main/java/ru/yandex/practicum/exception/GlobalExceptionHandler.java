@@ -115,6 +115,57 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
+    @ExceptionHandler(NoDeliveryFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoDeliveryFound(NoDeliveryFoundException ex) {
+        log.error("Доставка не найдена: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .httpStatus(HttpStatus.NOT_FOUND)
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .userMessage(ex.getUserMessage())
+                .message(ex.getMessage())
+                .stackTrace(getStackTraceAsString(ex))
+                .cause(getCauseAsString(ex))
+                .localizedMessage(ex.getLocalizedMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(NoOrderFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoOrderFound(NoOrderFoundException ex) {
+        log.error("Заказ не найден: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .httpStatus(HttpStatus.NOT_FOUND)
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .userMessage(ex.getUserMessage())
+                .message(ex.getMessage())
+                .stackTrace(getStackTraceAsString(ex))
+                .cause(getCauseAsString(ex))
+                .localizedMessage(ex.getLocalizedMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(NotEnoughInfoInOrderToCalculateException.class)
+    public ResponseEntity<ErrorResponse> handleNotEnoughInfoInOrderToCalculate(NotEnoughInfoInOrderToCalculateException ex) {
+        log.error("Недостаточно информации в заказе для расчёта: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .userMessage(ex.getUserMessage())
+                .message(ex.getMessage())
+                .stackTrace(getStackTraceAsString(ex))
+                .cause(getCauseAsString(ex))
+                .localizedMessage(ex.getLocalizedMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         log.error("Некорректные параметры запроса: {}", ex.getMessage());

@@ -1,16 +1,12 @@
 package ru.yandex.practicum.dto.cart;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Service;
+import lombok.*;
 
 import java.util.UUID;
 
 @Builder
 @Getter
-@Service
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangeProductQuantityRequest {

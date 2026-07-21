@@ -27,12 +27,20 @@ public class ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
     private final CartItemRepository cartItemRepository;
+    private final WarehouseClient warehouseClient;
 
     public ShoppingCartDto getShoppingCart(String username) {
         // TODO: реализовать получение корзины
         ShoppingCart cart = getOrCreateActiveCart(username);
         return ShoppingCartMapper.toDto(cart);
     }
+
+    public ShoppingCart getCartById(UUID shoppingCartId) {
+        // TODO: реализовать получение корзины по id
+        ShoppingCart cart = shoppingCartRepository.getReferenceById(shoppingCartId);
+        return cart;
+    }
+
 
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Long> products) {
         // TODO: реализовать добавление товаров в корзину
@@ -107,7 +115,7 @@ public class ShoppingCartService {
                     .orElseThrow(() -> new ProductNotFoundException("Корзина не найдена"));
             log.info("Найдена активная корзина");
             return cart;
-        }catch (ProductNotFoundException e) {
+        } catch (ProductNotFoundException e) {
             ShoppingCart newCart = ShoppingCart.builder()
                     .shoppingCartId(UUID.randomUUID())
                     .username(username)

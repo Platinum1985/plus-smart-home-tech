@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
