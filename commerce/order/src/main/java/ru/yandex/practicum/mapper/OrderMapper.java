@@ -3,8 +3,8 @@ package ru.yandex.practicum.mapper;
 
 import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.dto.order.OrderDto;
-import ru.yandex.practicum.dto.order.entity.Order;
-import ru.yandex.practicum.dto.order.entity.OrderProduct;
+import ru.yandex.practicum.model.Order;
+import ru.yandex.practicum.model.OrderProduct;
 import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 
 import java.util.List;

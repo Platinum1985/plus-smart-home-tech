@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.order.entity.Order;
+import ru.yandex.practicum.model.Order;
 import ru.yandex.practicum.state.OrderState;
 
 import java.util.List;
