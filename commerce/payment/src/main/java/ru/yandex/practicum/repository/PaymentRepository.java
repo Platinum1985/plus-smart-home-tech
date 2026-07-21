@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.payment.entity.Payment;
+import ru.yandex.practicum.model.Payment;
 import ru.yandex.practicum.state.PaymentStatus;
 
 import java.util.List;
